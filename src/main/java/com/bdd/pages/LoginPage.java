@@ -1,23 +1,29 @@
 package com.bdd.pages;
 
-import org.openqa.selenium.By;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
 
 public class LoginPage extends BasePage {
 
-    private static By usernameField = By.id("username");
-    private static By passwordField = By.id("password");
-    private static By loginButton = By.id("login");
+    @FindBy(id = "username")
+    private static WebElement usernameField;
 
-    public static void enterUsername(String username) {
-        type(usernameField, username);
+    @FindBy(id = "password")
+    private static WebElement passwordField;
+
+    @FindBy(id = "loginButton")
+    private static WebElement loginButton;
+
+    public LoginPage(WebDriver driver) {
+        super(driver);
     }
 
-    public static void enterPassword(String password) {
-        type(passwordField, password);
-    }
-
-    public static void clickLoginButton() {
-        click(loginButton);
+    public static void login(String username, String password) {
+        usernameField.sendKeys(username);
+        passwordField.sendKeys(password);
+        loginButton.click();
     }
 }

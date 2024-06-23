@@ -1,6 +1,5 @@
 package com.bdd.core;
 
-
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -21,8 +20,8 @@ public class DriverManager {
         if (driver == null) {
             WebDriverManager.chromedriver().setup();
 //            WebDriverManager.chromedriver().browserVersion("126.0.6478.115").setup();
-            driver = new ChromeDriver();
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+            driver = new ChromeDriver(getChromeOptions());
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
             driver.manage().window().maximize();
         }
         return driver;

@@ -13,19 +13,19 @@ public class LoginSteps {
 
     @Given("I am on the login page")
     public void i_am_on_the_login_page() {
-        String url = ConfigReader.getProperty("url");
-        DriverManager.getDriver().get(url);
+        DriverManager.getDriver().get(ConfigReader.getProperty("url"));
+        new LoginPage(DriverManager.getDriver());
+
     }
 
     @When("I enter username {string} and password {string}")
     public void i_enter_username_and_password(String username, String password) {
-        LoginPage.enterUsername(username);
-        LoginPage.enterPassword(password);
+        LoginPage.login(ConfigReader.getProperty("username"), ConfigReader.getProperty("password"));
+
     }
 
     @When("I click on the login button")
     public void i_click_on_the_login_button() {
-        LoginPage.clickLoginButton();
     }
 
     @Then("I should see the homepage")
