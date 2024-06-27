@@ -1,24 +1,29 @@
 package com.bdd.config;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.io.*;
 
 public class ConfigReader {
 
-    private static Properties properties;
+    private static JsonObject config;
 
     static {
-        properties = new Properties();
-        try (InputStream inputStream = new FileInputStream("src/main/resources/config.properties")) {
-            properties.load(inputStream);
+        try {
+            FileReader reader = new FileReader("src/main/resources/config.json");
+            config = JsonParser.parseReader(reader).getAsJsonObject();
+            reader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
-    public static String getProperty(String propertyName) {
-        return properties.getProperty(propertyName);
+    public static String getProperty(String key) {
+        return config.get(key).getAsString();
+    }
+
+    public static boolean getBooleanProperty(String key) {
+        return config.has(key) ? config.get(key).getAsBoolean() : false;
     }
 }

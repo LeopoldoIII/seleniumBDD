@@ -1,5 +1,6 @@
 package com.bdd.core;
 
+import com.bdd.config.ConfigReader;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -29,6 +30,25 @@ public class DriverManager {
 
     private static ChromeOptions getChromeOptions() {
         ChromeOptions options = new ChromeOptions();
+        if (ConfigReader.getBooleanProperty("headless")) {
+            configHeadlessOptions(options);
+        } else {
+            configStandardOptions(options);
+        }
+        return options;
+    }
+
+    private static void configHeadlessOptions(ChromeOptions options) {
+        options.addArguments("--headless");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--ignore-certificate-errors");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+    }
+
+    private static void configStandardOptions(ChromeOptions options) {
         options.addArguments("--disable-extensions");
         options.addArguments("--disable-popup-blocking");
         options.addArguments("--ignore-certificate-errors");
@@ -37,10 +57,7 @@ public class DriverManager {
         prefs.put("profile.default_content_settings.popups", 0);
         prefs.put("download.prompt_for_download", "false");
         options.setExperimentalOption("prefs", prefs);
-
-        return options;
     }
-
     public static void closeDriver() {
         if (driver != null) {
             driver.quit();
