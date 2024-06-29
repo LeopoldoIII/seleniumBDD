@@ -1,8 +1,8 @@
-# Selenium Testing Framework
+# Selenium/RESTAssured Testing Framework
 
 ## Overview
 
-This project is a Selenium-based automated testing framework written in Java. It follows the Page Object Model (POM) and Behavior Driven Development (BDD) principles to provide a structured and maintainable way to write and execute tests. The framework uses WebDriverManager to manage browser drivers and supports running tests in headless mode for continuous integration environments.
+This project is a Selenium-based & RESTAssured automated testing framework written in Java. It follows the Page Object Model (POM) and Behavior Driven Development (BDD) principles to provide a structured and maintainable way to write and execute tests. The framework uses WebDriverManager to manage browser drivers and supports running tests in headless mode for continuous integration environments.
 
 
 ## Setup
@@ -24,6 +24,10 @@ This project is a Selenium-based automated testing framework written in Java. It
 
    ```bash
    mvn clean test -Dtest=UiTestRunner
+    ```
+
+    ```bash
+   mvn clean test -Dtest=ApiTestRunner
     ```
 
 ### Configuration
