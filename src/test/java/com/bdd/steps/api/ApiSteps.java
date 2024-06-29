@@ -3,6 +3,7 @@ package com.bdd.steps.api;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import static io.restassured.RestAssured.given;
 import static org.testng.AssertJUnit.assertEquals;
@@ -30,6 +31,9 @@ public class ApiSteps {
 
     @Then("the response should contain {string}")
     public void the_response_should_contain(String content) {
-        assertEquals(response.getBody().asString(), content);
+        String responseString = response.getBody().asString();
+        JsonPath jsonPath = new JsonPath(responseString);
+        String name = jsonPath.getString("name");
+        assertEquals(name, content);
     }
 }

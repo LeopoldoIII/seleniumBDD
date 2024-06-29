@@ -7,7 +7,7 @@ import org.testng.annotations.DataProvider;
 
 @CucumberOptions(
         features = "src/test/resources/features/api",
-        glue = {"your.package.name.api.steps"},
+        glue = {"com/bdd/steps/api"},
         plugin = {"pretty", "html:target/cucumber-reports.html"}
 )
 public class ApiTestRunner extends AbstractTestNGCucumberTests {
