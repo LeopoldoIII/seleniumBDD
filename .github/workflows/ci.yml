@@ -38,7 +38,7 @@ jobs:
           cache: maven
 
       - name: Run UI Tests
-        run: mvn test -Dtest=com.bdd.runners.UiTestRunner -Dcucumber.options="--glue com.bdd.steps src/test/resources/features/UI"
+        run: mvn test -Dtest=com.bdd.runners.UiTestRunner
 
       - name: Archive UI test results
         if: always()
