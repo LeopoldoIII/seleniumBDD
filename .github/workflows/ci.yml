@@ -38,7 +38,7 @@ jobs:
           cache: maven
 
       - name: Run UI Tests
-        run: mvn test -Dtest=com/bdd/runners/UiTestRunner
+        run: mvn test -Dtest=com.bdd.runners.UiTestRunner
 
       - name: Archive UI test results
         if: always()
@@ -61,7 +61,7 @@ jobs:
           cache: maven
 
       - name: Run API Tests
-        run: mvn test -Dtest=com/bdd/runners/ApiTestRunner
+        run: mvn test -Dtest=com.bdd.runners.ApiTestRunner
 
       - name: Archive API test results
         if: always()
