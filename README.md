@@ -22,6 +22,10 @@ This project is a Selenium-based automated testing framework written in Java. It
     mvn clean install
     ```
 
+   ```bash
+   mvn clean test -Dtest=UiTestRunner
+    ```
+
 ### Configuration
 
 Edit the `src/main/resources/config.json` file to set up the configuration parameters, such as the URL, username, password, and whether to run in headless mode.

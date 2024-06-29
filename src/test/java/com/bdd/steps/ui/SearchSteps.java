@@ -1,4 +1,4 @@
-package com.bdd.steps;
+package com.bdd.steps.ui;
 
 import com.bdd.core.DriverManager;
 import com.bdd.pages.SearchPage;

@@ -1,4 +1,4 @@
-package com.bdd.steps;
+package com.bdd.steps.ui;
 
 
 import io.cucumber.java.en.Given;
