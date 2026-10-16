@@ -1,22 +1,28 @@
 package com.bdd.pages;
 
-import com.bdd.core.DriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-public class SearchPage extends BasePage{
+public class SearchPage extends BasePage {
 
     @FindBy(css = "#APjFqb")
-    private  static WebElement search;
+    private WebElement searchField;
 
     public SearchPage(WebDriver driver) {
         super(driver);
     }
 
-
-    public static void search() throws InterruptedException {
-        search.click();
+    public SearchPage() {
+        super();
     }
 
+    public void clickSearch() {
+        click(searchField);
+    }
+
+    public void searchFor(String query) {
+        type(searchField, query);
+        pressEnter(searchField);
+    }
 }

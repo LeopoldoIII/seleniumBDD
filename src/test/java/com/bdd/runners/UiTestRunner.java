@@ -6,10 +6,9 @@ import org.testng.annotations.DataProvider;
 
 @CucumberOptions(
         features = "src/test/resources/features/UI",
-        glue = {"com/bdd/steps/ui", "com/bdd/hooks"},
-        plugin = {"pretty", "html:target/cucumber-reports"}
+        glue = {"com/bdd/steps/ui", "com/bdd/steps/database", "com/bdd/hooks"},
+        plugin = {"pretty", "html:target/cucumber-ui-reports.html"}
 )
-
 public class UiTestRunner extends AbstractTestNGCucumberTests {
 
     @Override

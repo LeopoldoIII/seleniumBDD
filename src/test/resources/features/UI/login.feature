@@ -1,8 +1,13 @@
-Feature: Login Functionality
+@ui
+Feature: Login and Navigation Functionality
 
-  Scenario: Successful login
+  @smoke
+  Scenario: Navigate to base URL and verify page title
     Given I am on the login page
-    When  I click on search
-#    When I enter username "user123" and password "password123"
-#    And I click on the login button
-#    Then I should see the homepage
+    Then I should see the homepage
+
+  @regression
+  Scenario: Login with credentials
+    Given I am on the login page
+    When I enter username "DEFAULT" and password "DEFAULT"
+    Then I should see the homepage

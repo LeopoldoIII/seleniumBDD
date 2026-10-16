@@ -1,6 +1,34 @@
 {
-"url": "https://www.google.com.mx/",
-"username": "testuser",
-"password": "testpassword",
-"headless": true
+  "execution": "local",
+  "target": "web",
+  "browser": "chrome",
+  "headless": false,
+  "baseUrl": "http://localhost:8080",
+  "url": "http://localhost:8080",
+  "username": "testuser",
+  "password": "testpassword",
+  "timeout": 10,
+  "api": {
+    "baseUri": "http://localhost:8080/api"
+  },
+  "saucelabs": {
+    "username": "YOUR_SAUCE_USERNAME",
+    "accessKey": "YOUR_SAUCE_ACCESS_KEY",
+    "region": "us-west-1",
+    "tunnelName": ""
+  },
+  "mobile": {
+    "platformName": "Android",
+    "deviceName": "emulator-5554",
+    "automationName": "UiAutomator2",
+    "app": "src/test/resources/apps/sample.apk",
+    "appPackage": "com.example.installments",
+    "appActivity": "com.example.installments.MainActivity"
+  },
+  "database": {
+    "url": "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1",
+    "username": "sa",
+    "password": "",
+    "driver": "org.h2.Driver"
+  }
 }
