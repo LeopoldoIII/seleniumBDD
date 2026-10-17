@@ -8,10 +8,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 
 /**
  * Standalone mock server simulating 'installments.jar' for local interview practice.
@@ -23,6 +27,7 @@ public class MockInstallmentsServer {
     private static final int PORT = 8080;
     private static HttpServer server;
     private static final List<String> plans = new ArrayList<>();
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
     static {
         // Seeded plan IDs as mentioned in the interview kit
@@ -37,7 +42,7 @@ public class MockInstallmentsServer {
         System.out.println(" Mock installments.jar Server started on port " + PORT);
         System.out.println(" Web UI:  http://localhost:" + PORT + "/login");
         System.out.println(" REST API: http://localhost:" + PORT + "/api/plans");
-        System.out.println(" Credentials: testuser / testpassword");
+        System.out.println(" Credentials: testuser@example.com / testpassword");
         System.out.println("======================================================");
     }
 
@@ -72,15 +77,34 @@ public class MockInstallmentsServer {
     static class LoginHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            String errorMessage = null;
+
             if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
                 InputStream is = exchange.getRequestBody();
                 String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-                if (body.contains("username=testuser") && body.contains("password=testpassword")) {
+                Map<String, String> params = parseFormData(body);
+                String user = params.getOrDefault("username", "").trim();
+                String pass = params.getOrDefault("password", "").trim();
+
+                if (user.isEmpty()) {
+                    errorMessage = "Username is required!";
+                } else if (!EMAIL_PATTERN.matcher(user).matches()) {
+                    errorMessage = "Username must be a valid email address!";
+                } else if (pass.isEmpty()) {
+                    errorMessage = "Password is required!";
+                } else if ("testuser@example.com".equalsIgnoreCase(user) && "testpassword".equals(pass)) {
                     exchange.getResponseHeaders().set("Location", "/dashboard");
                     exchange.sendResponseHeaders(302, -1);
                     return;
+                } else {
+                    errorMessage = "Invalid username or password!";
                 }
             }
+
+            String errorHtml = (errorMessage != null)
+                ? "<div id=\"errorMessage\" class=\"alert\" style=\"background: #ef4444; color: #fff; padding: 0.75rem; border-radius: 6px; margin-bottom: 1.25rem; font-size: 0.85rem; font-weight: 500; text-align: center;\">" 
+                  + errorMessage + "</div>"
+                : "";
 
             String html = """
                 <!DOCTYPE html>
@@ -101,11 +125,12 @@ public class MockInstallmentsServer {
                 <body>
                     <div class="card">
                         <h2>Installments App</h2>
-                        <form method="POST" action="/login">
-                            <label for="username">Username</label>
-                            <input type="text" id="username" name="username" placeholder="testuser" required>
+                        """ + errorHtml + """
+                        <form method="POST" action="/login" novalidate>
+                            <label for="username">Email Address</label>
+                            <input type="email" id="username" name="username" placeholder="testuser@example.com">
                             <label for="password">Password</label>
-                            <input type="password" id="password" name="password" placeholder="testpassword" required>
+                            <input type="password" id="password" name="password" placeholder="testpassword">
                             <button type="submit" id="loginButton">Sign In</button>
                         </form>
                     </div>
@@ -113,6 +138,21 @@ public class MockInstallmentsServer {
                 </html>
                 """;
             sendResponse(exchange, 200, "text/html", html);
+        }
+
+        private Map<String, String> parseFormData(String formData) {
+            Map<String, String> map = new HashMap<>();
+            if (formData == null || formData.isEmpty()) return map;
+            String[] pairs = formData.split("&");
+            for (String pair : pairs) {
+                String[] kv = pair.split("=");
+                if (kv.length > 0) {
+                    String key = URLDecoder.decode(kv[0], StandardCharsets.UTF_8);
+                    String val = kv.length > 1 ? URLDecoder.decode(kv[1], StandardCharsets.UTF_8) : "";
+                    map.put(key, val);
+                }
+            }
+            return map;
         }
     }
 

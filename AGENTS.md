@@ -32,4 +32,6 @@ Modular rules and runbooks are organized under `.agents/`:
 - `.agents/skills/create-ui-test/`: Procedural runbook for creating UI / Mobile tests
 - `.agents/skills/create-api-test/`: Procedural runbook for creating REST API tests
 - `.agents/skills/create-db-test/`: Procedural runbook for database SQL validations
+- `.agents/skills/add-bdd-scenario/`: Procedural runbook for translating requirements to BDD scenarios
+- `.agents/skills/dom-to-page-object/`: Procedural runbook for parsing DOM HTML into Page Objects and locators
 - `.agents/skills/run-tests/`: Procedural runbook for running and filtering test suites

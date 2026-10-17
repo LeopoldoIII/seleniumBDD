@@ -170,15 +170,41 @@ public class ConfigReader {
     }
 
     public static String getMobileDeviceName() {
-        return getProperty("mobile.deviceName");
+        String platform = getMobilePlatform().toLowerCase();
+        String name = getProperty("mobile." + platform + ".deviceName");
+        return (name != null && !name.isEmpty()) ? name : getProperty("mobile.deviceName");
     }
 
     public static String getMobileAutomationName() {
-        return getProperty("mobile.automationName");
+        String platform = getMobilePlatform().toLowerCase();
+        String auto = getProperty("mobile." + platform + ".automationName");
+        if (auto != null && !auto.isEmpty()) return auto;
+        return platform.equals("ios") ? "XCUITest" : "UiAutomator2";
     }
 
     public static String getMobileApp() {
-        return getProperty("mobile.app");
+        String platform = getMobilePlatform().toLowerCase();
+        String app = getProperty("mobile." + platform + ".app");
+        return (app != null && !app.isEmpty()) ? app : getProperty("mobile.app");
+    }
+
+    public static String getMobilePlatformVersion() {
+        String platform = getMobilePlatform().toLowerCase();
+        return getProperty("mobile." + platform + ".platformVersion");
+    }
+
+    public static String getIosBundleId() {
+        return getProperty("mobile.ios.bundleId");
+    }
+
+    public static String getAndroidAppPackage() {
+        String pkg = getProperty("mobile.android.appPackage");
+        return (pkg != null && !pkg.isEmpty()) ? pkg : getProperty("mobile.appPackage");
+    }
+
+    public static String getAndroidAppActivity() {
+        String act = getProperty("mobile.android.appActivity");
+        return (act != null && !act.isEmpty()) ? act : getProperty("mobile.appActivity");
     }
 
     // Convenience Getters for Database (SQL)

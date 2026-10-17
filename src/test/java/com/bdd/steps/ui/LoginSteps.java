@@ -37,4 +37,10 @@ public class LoginSteps {
     public void i_should_see_the_homepage() {
         Assert.assertFalse(loginPage.getPageTitle().isEmpty(), "Page title should not be empty");
     }
+
+    @Then("I should see the error message {string}")
+    public void i_should_see_the_error_message(String expectedMessage) {
+        Assert.assertTrue(loginPage.isErrorMessageDisplayed(), "Error message is not displayed");
+        Assert.assertEquals(loginPage.getErrorMessageText(), expectedMessage, "Error message text mismatch");
+    }
 }

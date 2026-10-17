@@ -90,9 +90,17 @@ public class DriverFactory {
             if ("ios".equalsIgnoreCase(platform)) {
                 XCUITestOptions options = new XCUITestOptions();
                 options.setDeviceName(ConfigReader.getMobileDeviceName());
+                String platformVersion = ConfigReader.getMobilePlatformVersion();
+                if (platformVersion != null && !platformVersion.isEmpty()) {
+                    options.setPlatformVersion(platformVersion);
+                }
                 String app = ConfigReader.getMobileApp();
                 if (app != null && !app.isEmpty()) {
                     options.setApp(app);
+                }
+                String bundleId = ConfigReader.getIosBundleId();
+                if (bundleId != null && !bundleId.isEmpty()) {
+                    options.setBundleId(bundleId);
                 }
 
                 if (execution == ExecutionTarget.SAUCELABS) {
@@ -105,12 +113,16 @@ public class DriverFactory {
                 // Default Android
                 UiAutomator2Options options = new UiAutomator2Options();
                 options.setDeviceName(ConfigReader.getMobileDeviceName());
+                String platformVersion = ConfigReader.getMobilePlatformVersion();
+                if (platformVersion != null && !platformVersion.isEmpty()) {
+                    options.setPlatformVersion(platformVersion);
+                }
                 String app = ConfigReader.getMobileApp();
                 if (app != null && !app.isEmpty()) {
                     options.setApp(app);
                 }
-                String appPackage = ConfigReader.getProperty("mobile.appPackage");
-                String appActivity = ConfigReader.getProperty("mobile.appActivity");
+                String appPackage = ConfigReader.getAndroidAppPackage();
+                String appActivity = ConfigReader.getAndroidAppActivity();
                 if (appPackage != null && appActivity != null) {
                     options.setAppPackage(appPackage);
                     options.setAppActivity(appActivity);

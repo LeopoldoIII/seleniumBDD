@@ -41,5 +41,8 @@ public class Hooks {
             // 3. Teardown driver and clean up ThreadLocal
             DriverManager.quitDriver();
         }
+
+        // Clean up scenario context data
+        com.bdd.utils.ScenarioContext.clear();
     }
 }

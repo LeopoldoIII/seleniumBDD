@@ -41,7 +41,18 @@ public class LoginPage extends BasePage {
         clickLogin();
     }
 
+    @FindBy(id = "errorMessage")
+    private WebElement errorMessage;
+
     public boolean isLoginButtonDisplayed() {
         return isDisplayed(loginButton);
+    }
+
+    public boolean isErrorMessageDisplayed() {
+        return isDisplayed(errorMessage);
+    }
+
+    public String getErrorMessageText() {
+        return getText(errorMessage);
     }
 }

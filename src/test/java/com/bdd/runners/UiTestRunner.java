@@ -7,7 +7,7 @@ import org.testng.annotations.DataProvider;
 @CucumberOptions(
         features = "src/test/resources/features/UI",
         glue = {"com/bdd/steps/ui", "com/bdd/steps/database", "com/bdd/hooks"},
-        plugin = {"pretty", "html:target/cucumber-ui-reports.html"}
+        plugin = {"pretty", "html:target/cucumber-ui-reports.html", "rerun:target/failed_rerun.txt"}
 )
 public class UiTestRunner extends AbstractTestNGCucumberTests {
 

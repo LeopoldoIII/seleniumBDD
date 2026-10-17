@@ -160,6 +160,16 @@ public class BasePage {
         return select.getFirstSelectedOption().getText().trim();
     }
 
+    /**
+     * Angular Material support: opens mat-select and selects option from CDK overlay.
+     */
+    public void selectMatOption(WebElement matSelectElement, String optionText) {
+        click(matSelectElement);
+        WebElement option = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//mat-option[normalize-space()='" + optionText + "'] | //div[@role='listbox']//span[normalize-space()='" + optionText + "']")));
+        click(option);
+    }
+
     // ==========================================
     // Checkboxes & Radio Buttons
     // ==========================================

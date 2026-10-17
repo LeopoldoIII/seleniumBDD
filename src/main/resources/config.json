@@ -5,7 +5,7 @@
   "headless": false,
   "baseUrl": "http://localhost:8080",
   "url": "http://localhost:8080",
-  "username": "testuser",
+  "username": "testuser@example.com",
   "password": "testpassword",
   "timeout": 10,
   "api": {
@@ -19,11 +19,21 @@
   },
   "mobile": {
     "platformName": "Android",
-    "deviceName": "emulator-5554",
-    "automationName": "UiAutomator2",
-    "app": "src/test/resources/apps/sample.apk",
-    "appPackage": "com.example.installments",
-    "appActivity": "com.example.installments.MainActivity"
+    "android": {
+      "deviceName": "emulator-5554",
+      "platformVersion": "14.0",
+      "automationName": "UiAutomator2",
+      "app": "src/test/resources/apps/sample.apk",
+      "appPackage": "com.example.installments",
+      "appActivity": "com.example.installments.MainActivity"
+    },
+    "ios": {
+      "deviceName": "iPhone 15 Pro",
+      "platformVersion": "17.4",
+      "automationName": "XCUITest",
+      "app": "src/test/resources/apps/sample.app",
+      "bundleId": "com.example.installments"
+    }
   },
   "database": {
     "url": "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1",

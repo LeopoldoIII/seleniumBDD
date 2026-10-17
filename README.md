@@ -1,98 +1,394 @@
 # Omnichannel BDD Test Automation Framework (Java 21)
 
-Enterprise-grade test automation framework built for **Web UI**, **REST API**, **Mobile (Android/iOS via Appium)**, and **Database (SQL/JDBC)** testing with **Cucumber BDD**, **TestNG**, and support for **Sauce Labs** cloud execution.
+Enterprise-grade test automation framework built for **Web UI**, **REST API**, **Mobile (Android & iOS via Appium)**, and **Database (SQL/JDBC)** testing using **Cucumber BDD**, **TestNG**, and **Selenium WebDriver**, with out-of-the-box support for **Sauce Labs** cloud execution.
 
 ---
 
-## 🚀 Quick Start for Live Coding (60 min)
+## 📑 Table of Contents
+1. [Execution Matrix (All CLI Combinations)](#1-execution-matrix-all-cli-combinations)
+2. [TestNG Architecture & Lifecycle Deep Dive](#2-testng-architecture--lifecycle-deep-dive)
+3. [The 4 OOP Pillars in Java: Corporate & Framework Examples](#3-the-4-oop-pillars-in-java-corporate--framework-examples)
+4. [Mobile Automation (Android & iOS Support)](#4-mobile-automation-android--ios-support)
+5. [Sharing State Across Steps (The `ScenarioContext` Pattern)](#5-sharing-state-across-steps-the-scenariocontext-pattern)
+6. [Hybrid Strategy: Combining API, UI & SQL](#6-hybrid-strategy-combining-api-ui--sql)
+7. [Directory Structure](#7-directory-structure)
 
-### 1. Levantar el servicio local (`installments.jar`)
-Si te proporcionan el archivo `.jar` en la entrevista:
+---
+
+## 1. Execution Matrix (All CLI Combinations)
+
+Configuration resolution follows a strict priority hierarchy:
+`CLI System Properties (-D)` > `Environment Variables` > `src/main/resources/config.json`.
+
+### A. Web UI Execution (Local Browsers)
 ```bash
-java -jar installments.jar
-# (Típicamente corre en http://localhost:8080)
-```
+# 1. Standard execution against default URL (config.json)
+mvn clean test -Dtest=UiTestRunner
 
-### 2. Ejecutar Pruebas UI
-```bash
-# Ejecutar contra localhost (o sobreescribir la URL base al vuelo):
-mvn clean test -Dtest=UiTestRunner -DbaseUrl=http://localhost:8080
+# 2. Override Base URL dynamically (e.g., local installments.jar on port 8080)
+mvn test -Dtest=UiTestRunner -DbaseUrl=http://localhost:8080
 
-# Ejecutar con navegador visible (no-headless):
+# 3. Disable headless mode (visually observe browser in desktop Chrome)
 mvn test -Dtest=UiTestRunner -Dheadless=false
 
-# Filtrar por tags (ej. @smoke o @regression):
+# 4. Cross-browser: Run on Firefox (headless)
+mvn test -Dtest=UiTestRunner -Dbrowser=firefox -Dheadless=true
+
+# 5. Cross-browser: Run on Firefox (desktop window)
+mvn test -Dtest=UiTestRunner -Dbrowser=firefox -Dheadless=false
+
+# 6. Run a specific Cucumber tag (e.g., @smoke, @regression, @negative)
 mvn test -Dtest=UiTestRunner -Dcucumber.filter.tags="@smoke"
+
+# 7. Combined tag expression (Smoke tests that are NOT negative)
+mvn test -Dtest=UiTestRunner -Dcucumber.filter.tags="@smoke and not @negative"
+
+# 8. Run an exact feature file directly
+mvn test -Dtest=UiTestRunner -Dcucumber.features="src/test/resources/features/UI/installments.feature"
+
+# 9. Control parallel thread count (e.g., 4 concurrent scenarios)
+mvn test -Dtest=UiTestRunner -Ddataproviderthreadcount=4
 ```
 
-### 3. Ejecutar Pruebas API (REST Assured)
+### B. REST API Execution (REST Assured)
 ```bash
+# 1. Run all API scenarios (does not launch browser instances)
 mvn clean test -Dtest=ApiTestRunner
 
-# Sobreescribiendo la URL base del API:
+# 2. Override API Base URI dynamically
 mvn test -Dtest=ApiTestRunner -Dapi.baseUri=http://localhost:8080/api
+
+# 3. Filter specific API tag (e.g., local mock endpoint validations)
+mvn test -Dtest=ApiTestRunner -Dcucumber.filter.tags="@local"
 ```
 
-### 4. Ejecutar en Sauce Labs (Cloud)
+### C. Cloud Execution (Sauce Labs)
 ```bash
+# 1. Desktop Web on Sauce Labs (Chrome)
 mvn test -Dtest=UiTestRunner \
   -Dexecution=saucelabs \
-  -Dsaucelabs.username="TU_USUARIO" \
-  -Dsaucelabs.accessKey="TU_ACCESS_KEY" \
+  -Dsaucelabs.username="YOUR_USERNAME" \
+  -Dsaucelabs.accessKey="YOUR_ACCESS_KEY" \
   -Dsaucelabs.region="us-west-1"
+
+# 2. Desktop Web on Sauce Labs (Firefox)
+mvn test -Dtest=UiTestRunner \
+  -Dexecution=saucelabs \
+  -Dbrowser=firefox \
+  -Dsaucelabs.username="YOUR_USERNAME" \
+  -Dsaucelabs.accessKey="YOUR_ACCESS_KEY"
+
+# 3. Cloud Mobile: Android on Sauce Labs Real Device / Emulator
+mvn test -Dtest=UiTestRunner \
+  -Dexecution=saucelabs \
+  -Dtarget=mobile \
+  -Dmobile.platformName=Android \
+  -Dmobile.deviceName="Google Pixel 7" \
+  -Dsaucelabs.username="YOUR_USERNAME" \
+  -Dsaucelabs.accessKey="YOUR_ACCESS_KEY"
+
+# 4. Cloud Mobile: iOS on Sauce Labs Real Device / Simulator
+mvn test -Dtest=UiTestRunner \
+  -Dexecution=saucelabs \
+  -Dtarget=mobile \
+  -Dmobile.platformName=iOS \
+  -Dmobile.deviceName="iPhone 15 Pro" \
+  -Dsaucelabs.username="YOUR_USERNAME" \
+  -Dsaucelabs.accessKey="YOUR_ACCESS_KEY"
 ```
 
-### 5. Ejecutar Pruebas Móviles (Android / iOS)
+### D. Mobile Execution (Local Appium Server)
 ```bash
-# Android Local (Appium):
+# 1. Local Android (requires local Appium server running on port 4723)
+mvn test -Dtest=UiTestRunner \
+  -Dtarget=mobile \
+  -Dmobile.platformName=Android \
+  -Dmobile.android.deviceName="emulator-5554"
+
+# 2. Local iOS (requires macOS with Xcode & Appium XCUITest driver)
+mvn test -Dtest=UiTestRunner \
+  -Dtarget=mobile \
+  -Dmobile.platformName=iOS \
+  -Dmobile.ios.deviceName="iPhone 15 Pro"
+```
+
+### E. Database Validation (Dynamic JDBC Override)
+```bash
+# Override PostgreSQL / MySQL / H2 connection string via CLI
+mvn test -Dtest=UiTestRunner \
+  -Ddatabase.url="jdbc:postgresql://localhost:5432/installments_db" \
+  -Ddatabase.username="postgres" \
+  -Ddatabase.password="secret123"
+```
+
+---
+
+## 2. TestNG Architecture & Lifecycle Deep Dive
+
+### Q1: Is TestNG only implemented in `Hooks.java`?
+**No.** There is a critical architectural distinction between **Cucumber Hooks** and **TestNG Annotations**:
+
+| Aspect | Cucumber Hooks (`io.cucumber.java.*`) | TestNG Annotations (`org.testng.annotations.*`) |
+| :--- | :--- | :--- |
+| **Scope** | Bound to **BDD Scenarios** & Steps. | Bound to **TestNG Test Suites, Classes, and Runners**. |
+| **Annotations** | `@Before`, `@After`, `@BeforeStep`, `@AfterStep` | `@BeforeSuite`, `@AfterSuite`, `@BeforeClass`, `@DataProvider`, `@Listeners` |
+| **Lifecycle** | Runs before/after every single Gherkin scenario. | Runs once per test suite or manages runner-level parallel threads. |
+| **Role in this project** | [Hooks.java](file:///Users/user/Local/projects/seleniumBDD/src/test/java/com/bdd/hooks/Hooks.java) initializes the browser, takes failure screenshots, reports to Sauce Labs, and resets thread state. | [UiTestRunner.java](file:///Users/user/Local/projects/seleniumBDD/src/test/java/com/bdd/runners/UiTestRunner.java) extends `AbstractTestNGCucumberTests` to drive execution. |
+
+### Q2: How is TestNG leveraged in this framework?
+
+1. **Parallel Execution via `@DataProvider(parallel = true)`**:
+   In [UiTestRunner.java](file:///Users/user/Local/projects/seleniumBDD/src/test/java/com/bdd/runners/UiTestRunner.java), TestNG feeds Cucumber scenarios into parallel worker threads:
+   ```java
+   @Override
+   @DataProvider(parallel = true)
+   public Object[][] scenarios() {
+       return super.scenarios();
+   }
+   ```
+2. **Hard Assertions vs Soft Assertions**:
+   - **Hard Assertions (`Assert.assertEquals`)**: Immediately stops execution on failure (used in `@Then` verification steps).
+   - **Soft Assertions (`SoftAssert`)**: Gathers multiple field validations across a large table or form without stopping prematurely on the first mismatch:
+     ```java
+     SoftAssert soft = new SoftAssert();
+     soft.assertEquals(page.getStatus(), "ACTIVE");
+     soft.assertEquals(page.getAmount(), "$1,200.00");
+     soft.assertAll();
+     ```
+3. **TestNG Listeners (`ITestListener`, `IRetryAnalyzer`)**:
+   - `IRetryAnalyzer`: Re-executes flaky UI tests automatically up to *N* times before marking as failed.
+   - `ITestListener`: Custom logging, sending test metrics to Slack/Datadog, or timing execution durations.
+
+---
+
+## 3. The 4 OOP Pillars in Java: Corporate & Framework Examples
+
+### 1. Encapsulation (Encapsulamiento)
+*Keeping internal object state hidden, exposing only controlled, meaningful operations.*
+
+- **Corporate Example**: In a banking core system, a `BankAccount` object has a `private double balance;`. You cannot write `account.balance = -500;`. Instead, you call public audited methods like `account.deposit(amount)` and `account.withdraw(amount)` which validate fraud checks and funds before updating the internal field.
+- **In this Framework**:
+  In [LoginPage.java](file:///Users/user/Local/projects/seleniumBDD/src/main/java/com/bdd/pages/LoginPage.java) and [InstallmentsPage.java](file:///Users/user/Local/projects/seleniumBDD/src/main/java/com/bdd/pages/InstallmentsPage.java), all WebElements are strictly `private`:
+  ```java
+  @FindBy(id = "username")
+  private WebElement usernameField;
+  ```
+  Step definitions never touch `usernameField` or `driver.findElement` directly. They invoke public encapsulated actions:
+  ```java
+  public void enterUsername(String username) {
+      type(usernameField, username);
+  }
+  ```
+
+---
+
+### 2. Inheritance (Herencia)
+*Deriving new classes from parent classes to reuse common behavior and eliminate duplicate code.*
+
+- **Corporate Example**: An e-commerce platform has a base class `Notification` with `send()`, `log()`, and `recipient`. Subclasses like `EmailNotification`, `SmsNotification`, and `PushNotification` inherit the base fields and add channel-specific payloads.
+- **In this Framework**:
+  Every Page Object extends [BasePage.java](file:///Users/user/Local/projects/seleniumBDD/src/main/java/com/bdd/pages/BasePage.java):
+  ```java
+  public class InstallmentsPage extends BasePage {
+      public InstallmentsPage(WebDriver driver) {
+          super(driver);
+      }
+  }
+  ```
+  By calling `super(driver)`, `InstallmentsPage` automatically inherits `type()`, `click()`, `selectMatOption()`, `getTableCellText()`, explicit `WebDriverWait`, and JavaScript click fallbacks without re-implementing them.
+
+---
+
+### 3. Polymorphism (Polimorfismo)
+*The ability of different objects to respond to the same interface or method call in their own specific way (Subtyping / Method Overriding / Overloading).*
+
+- **Corporate Example**: A payment gateway interface `PaymentProcessor` with method `processPayment(double amount)`. Whether the customer pays with `StripeProcessor`, `PayPalProcessor`, or `CryptoProcessor`, the calling checkout service invokes `paymentProcessor.processPayment(amount)` identically.
+- **In this Framework**:
+  - **Interface Polymorphism**: `WebDriver` is a polymorphic interface. In [DriverFactory.java](file:///Users/user/Local/projects/seleniumBDD/src/main/java/com/bdd/core/driver/DriverFactory.java), `createDriver()` returns `WebDriver`. At runtime, the actual concrete instance can be a `ChromeDriver`, a `FirefoxDriver`, a `RemoteWebDriver` (Sauce Labs), an `AndroidDriver`, or an `IOSDriver`. [BasePage.java](file:///Users/user/Local/projects/seleniumBDD/src/main/java/com/bdd/pages/BasePage.java) interacts with all of them identically through the `WebDriver` contract.
+  - **Method Overloading**: `BasePage` overloads methods:
+    `click(WebElement element)` and `click(By locator)`.
+    `type(WebElement element, String text)` and `type(By locator, String text)`.
+
+---
+
+### 4. Abstraction (Abstracción)
+*Hiding complex low-level implementation details behind clean, intuitive high-level interfaces.*
+
+- **Corporate Example**: When you drive a car, you press the gas pedal to accelerate. You do not need to understand fuel injectors, air-fuel ratios, or spark plug timings. The pedal is the abstraction.
+- **In this Framework**:
+  - In [BasePage.java](file:///Users/user/Local/projects/seleniumBDD/src/main/java/com/bdd/pages/BasePage.java), when `click(WebElement)` is called, the caller does not care about `WebDriverWait`, `ExpectedConditions.elementToBeClickable()`, `ElementClickInterceptedException`, or `JavascriptExecutor.executeScript("arguments[0].click();")`. All synchronization and fallback complexity is abstracted away behind a clean `click(element)`.
+  - In [ApiClient.java](file:///Users/user/Local/projects/seleniumBDD/src/main/java/com/bdd/api/ApiClient.java), calling `apiClient.get("/plans")` abstracts away `RequestSpecBuilder`, Content-Type headers, HTTP connection pools, and URI builders.
+
+---
+
+## 4. Mobile Automation (Android & iOS Support)
+
+The framework natively handles **both Android (UiAutomator2) and iOS (XCUITest)** via Appium Java Client 9.x.
+
+### Configuration Schema (`src/main/resources/config.json`)
+```json
+{
+  "target": "mobile",
+  "mobile": {
+    "platformName": "Android",
+    "android": {
+      "deviceName": "emulator-5554",
+      "platformVersion": "14.0",
+      "automationName": "UiAutomator2",
+      "app": "src/test/resources/apps/sample.apk",
+      "appPackage": "com.example.installments",
+      "appActivity": "com.example.installments.MainActivity"
+    },
+    "ios": {
+      "deviceName": "iPhone 15 Pro",
+      "platformVersion": "17.4",
+      "automationName": "XCUITest",
+      "app": "src/test/resources/apps/sample.app",
+      "bundleId": "com.example.installments"
+    }
+  }
+}
+```
+
+### Switching Platforms on the Fly:
+```bash
+# Switch to Android
 mvn test -Dtest=UiTestRunner -Dtarget=mobile -Dmobile.platformName=Android
 
-# iOS Local (Appium):
+# Switch to iOS
 mvn test -Dtest=UiTestRunner -Dtarget=mobile -Dmobile.platformName=iOS
 ```
 
+Because `AndroidDriver` and `IOSDriver` implement `WebDriver`, **Page Objects extending `BasePage` can be reused across Web and Mobile**.
+
 ---
 
-## 🏛️ Arquitectura del Proyecto
+## 5. Sharing State Across Steps (The `ScenarioContext` Pattern)
+
+In Python Behave, you share variables using `context.my_var = value`.
+In this framework, [ScenarioContext.java](file:///Users/user/Local/projects/seleniumBDD/src/main/java/com/bdd/utils/ScenarioContext.java) replicates this exact capability in a **thread-safe** manner using `ThreadLocal<Map<String, Object>>`:
+
+### Storing Data in Step 1 (e.g., API creation):
+```java
+// Inside an API Step:
+Response response = apiClient.post("/api/plans", body);
+String createdPlanId = response.jsonPath().getString("id");
+ScenarioContext.set("planId", createdPlanId);
+```
+
+### Retrieving Data in Step 2 (e.g., UI or Database validation):
+```java
+// Inside a UI Step:
+String planId = ScenarioContext.get("planId", String.class);
+installmentsPage.clickPayForPlan(planId);
+```
+
+### Automatic Teardown:
+In [Hooks.java](file:///Users/user/Local/projects/seleniumBDD/src/test/java/com/bdd/hooks/Hooks.java), `@After` automatically invokes `ScenarioContext.clear()` to prevent data leaking into subsequent tests.
+
+---
+
+## 6. Hybrid Strategy: Combining API, UI & SQL
+
+In high-velocity enterprise teams and 60-minute live coding interviews, pure UI end-to-end tests are slow. We employ a **hybrid approach**:
 
 ```text
-src/
-├── main/
-│   ├── java/com/bdd/
-│   │   ├── config/ConfigReader.java      # Configuración multinivel (CLI > Env > JSON)
-│   │   ├── core/
-│   │   │   ├── DriverManager.java        # ThreadLocal<WebDriver> (Thread-safe para paralelismo)
-│   │   │   ├── driver/
-│   │   │   │   ├── DriverFactory.java    # Factoría para Chrome, Firefox, Android, iOS y Sauce Labs
-│   │   │   │   ├── SauceLabsManager.java # Opciones de Sauce Labs y actualización de job status
-│   │   │   │   ├── DriverType.java       # Enum de navegadores y plataformas
-│   │   │   │   └── ExecutionTarget.java  # Enum LOCAL vs SAUCELABS
-│   │   │   └── database/
-│   │   │       └── DbManager.java        # Conector SQL (Postgres, MySQL, H2) con executeQuery
-│   │   ├── api/
-│   │   │   └── ApiClient.java            # Cliente centralizado REST Assured
-│   │   └── pages/
-│   │       ├── BasePage.java             # Navaja Suiza: esperas explícitas, selects, tablas, clicks JS
-│   │       ├── LoginPage.java            # Page Object estándar (sin static)
-│   │       └── SearchPage.java           # Page Object estándar
-│   └── resources/
-│       └── config.json                   # Configuración central (Web, API, Mobile, DB, SauceLabs)
-└── test/
-    ├── java/com/bdd/
-    │   ├── hooks/Hooks.java              # Screenshots automáticos en fallo y reporte a Sauce Labs
-    │   ├── runners/                      # TestNG Runners (UiTestRunner, ApiTestRunner)
-    │   └── steps/                        # Step definitions (ui/, api/, database/)
-    └── resources/features/
-        ├── UI/login.feature              # Escenarios BDD para interfaz de usuario
-        └── API/api.feature               # Escenarios BDD para servicios REST
+[ 1. Seed via API ]           [ 2. Execute via UI ]          [ 3. Verify via SQL / API ]
+POST /api/plans (100ms)  ───> Navigate & Pay via UI   ───> SELECT * FROM plans (10ms)
+Fast test data setup          Verify user experience         Verify database persistence
+```
+
+- **Step 1**: Use [ApiClient.java](file:///Users/user/Local/projects/seleniumBDD/src/main/java/com/bdd/api/ApiClient.java) to create test entities in milliseconds without filling long forms.
+- **Step 2**: Use [BasePage.java](file:///Users/user/Local/projects/seleniumBDD/src/main/java/com/bdd/pages/BasePage.java) to validate the visual flow and payment action.
+- **Step 3**: Use [DbManager.java](file:///Users/user/Local/projects/seleniumBDD/src/main/java/com/bdd/core/database/DbManager.java) to execute SQL assertions verifying data consistency in the backend.
+
+---
+
+## 8. Ordered & Sequential Execution Strategies
+
+When business rules demand strict sequential scenario ordering (e.g., Onboarding -> KYC Approval -> Loan Issuance -> Payment):
+
+### Strategy A: Sequential Execution per Feature (Default Cucumber Behavior)
+By disabling TestNG parallelism (`parallel = false` in `DataProvider`), Cucumber executes scenarios **strictly top-to-bottom** in the order they appear in the `.feature` file:
+```java
+@Override
+@DataProvider(parallel = false)
+public Object[][] scenarios() {
+    return super.scenarios();
+}
+```
+
+### Strategy B: Phased Tag-Based Pipelines (Enterprise Standard)
+Instead of forcing sequential execution across 100 tests, divide business stages using tags in your CI/CD pipeline:
+```bash
+# Phase 1: Setup master accounts sequentially
+mvn test -Dtest=UiTestRunner -Dcucumber.filter.tags="@phase1_setup" -Ddataproviderthreadcount=1
+
+# Phase 2: Run core operations in parallel (10 threads)
+mvn test -Dtest=UiTestRunner -Dcucumber.filter.tags="@phase2_core" -Ddataproviderthreadcount=10
 ```
 
 ---
 
-## 💡 Puntos Clave para la Entrevista ("Walking Through Your Decisions")
+## 9. Flaky Test Retries (How Retry is Implemented)
 
-1. **Paralelización Segura**: Uso de `ThreadLocal<WebDriver>` en `DriverManager`, lo que permite que `UiTestRunner` ejecute escenarios en paralelo (`parallel = true`) sin colisiones entre navegadores.
-2. **Resiliencia (`BasePage`)**: Cero `Thread.sleep()`. Uso de `WebDriverWait` explícito con fallback automático a JavaScript Click cuando animaciones o modales bloquean el clic tradicional.
-3. **Soporte para Tablas Dinámicas**: `BasePage` incluye métodos preconstruidos (`getTableCellText`, `findRowIndexContainingText`) diseñados para aplicaciones de planes de cuotas (*installments*).
-4. **Validación End-to-End**: Capacidad de validar la persistencia en Base de Datos mediante `DbManager` (JDBC) y combinar flujos API + UI.
-5. **Sauce Labs Ready**: Integración con `sauce:options` y actualización automática del estado (`passed`/`failed`) directamente en el dashboard de Sauce Labs vía `Hooks.java`.
+The framework supports three complementary retry mechanisms:
+
+### Method 1: Automatic Re-run via `FailedUiTestRunner` (CI/CD Best Practice)
+The primary runner [UiTestRunner.java](file:///Users/user/Local/projects/seleniumBDD/src/test/java/com/bdd/runners/UiTestRunner.java) outputs failed scenario paths into `target/failed_rerun.txt`.
+To re-run **only** the failed scenarios after the main build:
+```bash
+# In your pipeline step:
+mvn test -Dtest=FailedUiTestRunner
+```
+
+### Method 2: Dynamic Cucumber Native Retry CLI Flag
+In Cucumber 6+, pass the retry count directly via Maven without modifying code:
+```bash
+mvn test -Dtest=UiTestRunner -Dcucumber.filter.rerun-count=2
+```
+If a scenario encounters a transient network glitch, Cucumber automatically retries it up to 2 additional times before recording a failure.
+
+### Method 3: TestNG `RetryAnalyzer`
+The framework includes [RetryAnalyzer.java](file:///Users/user/Local/projects/seleniumBDD/src/main/java/com/bdd/utils/RetryAnalyzer.java), which implements TestNG's `IRetryAnalyzer` to intercept failed test results and retry them programmatically.
+
+---
+
+## 10. Directory Structure
+
+```text
+seleniumBDD/
+├── pom.xml                               # Dependencies (Selenium, Appium, Cucumber, TestNG, REST Assured)
+├── README.md                             # Comprehensive Framework Reference Guide
+├── src/
+│   ├── main/
+│   │   ├── java/com/bdd/
+│   │   │   ├── api/ApiClient.java        # Centralized REST Assured client
+│   │   │   ├── config/ConfigReader.java  # Multi-level hierarchical configuration reader
+│   │   │   ├── core/
+│   │   │   │   ├── DriverManager.java    # ThreadLocal<WebDriver> lifecycle
+│   │   │   │   ├── database/DbManager.java # Generic JDBC database client
+│   │   │   │   └── driver/
+│   │   │   │       ├── DriverFactory.java     # Instantiates Local & Cloud drivers (Web/Mobile)
+│   │   │   │       └── SauceLabsManager.java  # Sauce Labs capabilities & status reporter
+│   │   │   ├── pages/                    # Page Object Model layer
+│   │   │   │   ├── BasePage.java         # "Swiss Army Knife" interaction & wait engine
+│   │   │   │   ├── LoginPage.java        # Standard POM (encapsulated WebElements)
+│   │   │   │   └── InstallmentsPage.java  # Table & action handlers for installments
+│   │   │   └── utils/
+│   │   │       └── ScenarioContext.java  # Thread-safe cross-step state manager
+│   │   └── resources/
+│   │       └── config.json               # Environment config (Web, API, Mobile, DB, SauceLabs)
+│   └── test/
+│       ├── java/com/bdd/
+│       │   ├── hooks/Hooks.java          # Screenshots on failure & SauceLabs reporting
+│       │   ├── mock/MockInstallmentsServer.java # Simulates installments.jar on port 8080
+│       │   ├── runners/
+│       │   │   ├── UiTestRunner.java     # Primary parallel TestNG runner
+│       │   │   ├── FailedUiTestRunner.java # Dedicated runner for re-executing failed tests
+│       │   │   └── ApiTestRunner.java    # REST API test runner
+│       │   ├── steps/                    # Step definitions (ui/, api/, database/)
+│       │   └── utils/
+│       │       └── RetryAnalyzer.java    # TestNG flaky test retry analyzer
+│       └── resources/features/           # Gherkin feature files (UI/ and API/)
+```
