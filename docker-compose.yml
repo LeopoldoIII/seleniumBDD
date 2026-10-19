@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: installments-postgres
+    environment:
+      POSTGRES_DB: installments_db
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: db_password123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U db_user -d installments_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  installments-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: installments-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: installments_db
+      DB_USER: db_user
+      DB_PASSWORD: db_password123
+      JWT_SECRET: c2VjdXJlSldUU2VjcmV0S2V5Rm9yU2VsZW5pdW1CRERGcmFtZXdvcmsyMDI2IQ==
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:

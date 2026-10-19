@@ -48,7 +48,7 @@ public class DbManager {
             int columnCount = metaData.getColumnCount();
 
             while (rs.next()) {
-                Map<String, Object> row = new HashMap<>();
+                Map<String, Object> row = new java.util.TreeMap<>(String.CASE_INSENSITIVE_ORDER);
                 for (int i = 1; i <= columnCount; i++) {
                     row.put(metaData.getColumnName(i), rs.getObject(i));
                 }

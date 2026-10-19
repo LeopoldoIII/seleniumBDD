@@ -1,0 +1,61 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: installments-backend
+  profiles:
+    active: local
+  jpa:
+    open-in-view: false
+    show-sql: false
+  sql:
+    init:
+      mode: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+jwt:
+  secret: c2VjdXJlSldUU2VjcmV0S2V5Rm9yU2VsZW5pdW1CRERGcmFtZXdvcmsyMDI2IQ==
+  expiration-ms: 86400000
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:h2:file:./data/testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: db_user
+    password: db_password123
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:installments_db}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USER:db_user}
+    password: ${DB_PASSWORD:db_password123}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update

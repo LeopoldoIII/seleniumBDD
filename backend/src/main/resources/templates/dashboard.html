@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installments Dashboard</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 2rem;
+            margin: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #1e293b;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        h1 {
+            color: #38bdf8;
+            margin: 0;
+            font-size: 1.6rem;
+        }
+        .user-info {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        .btn-logout {
+            background: #334155;
+            color: #f8fafc;
+            padding: 0.45rem 0.9rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .btn-logout:hover {
+            background: #475569;
+        }
+
+        /* Form Card for Creating New Plan */
+        .card-form {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .card-form h3 {
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            color: #38bdf8;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) 120px;
+            gap: 0.75rem;
+            align-items: end;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.55rem;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            background: #1e293b;
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 0.85rem;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #38bdf8;
+        }
+        .btn-create {
+            background: #10b981;
+            color: #fff;
+            border: none;
+            padding: 0.55rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            height: 38px;
+            transition: background 0.2s;
+        }
+        .btn-create:hover {
+            background: #059669;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            text-align: left;
+            padding: 0.85rem;
+            border-bottom: 1px solid #334155;
+        }
+        th {
+            background: #0f172a;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-active {
+            background: #065f46;
+            color: #34d399;
+        }
+        .badge-paid {
+            background: #1e3a8a;
+            color: #60a5fa;
+        }
+        .badge-pending {
+            background: #78350f;
+            color: #fbbf24;
+        }
+        .btn-pay {
+            background: #0284c7;
+            color: #fff;
+            border: none;
+            padding: 0.35rem 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+        .btn-pay:hover {
+            background: #0369a1;
+        }
+        .btn-delete {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 0.35rem 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8rem;
+            margin-left: 0.35rem;
+            transition: background 0.2s;
+        }
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Installment Plans Overview</h1>
+                <div class="user-info">Logged in as: <strong th:text="${currentUser}">testuser@example.com</strong> &bull; Full CRUD Dashboard</div>
+            </div>
+            <div>
+                <a href="/logout" id="logoutButton" class="btn-logout">Sign Out</a>
+            </div>
+        </div>
+
+        <!-- CREATE PLAN FORM -->
+        <div class="card-form">
+            <h3>Create New Installment Plan</h3>
+            <form method="POST" action="/dashboard/create">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="newPlanId">Plan ID</label>
+                        <input type="text" id="newPlanId" name="id" placeholder="PLAN-500" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newCustomer">Customer Name</label>
+                        <input type="text" id="newCustomer" name="customer" placeholder="Clark Kent" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newTotalAmount">Total Amount ($)</label>
+                        <input type="number" step="0.01" id="newTotalAmount" name="totalAmount" placeholder="1500.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newInstallments">Installments</label>
+                        <input type="number" id="newInstallments" name="installments" placeholder="12" required>
+                    </div>
+                    <button type="submit" id="createPlanButton" class="btn-create">Add Plan</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- READ, UPDATE, DELETE TABLE -->
+        <table id="installmentsTable">
+            <thead>
+                <tr>
+                    <th>Plan ID</th>
+                    <th>Customer</th>
+                    <th>Total Amount</th>
+                    <th>Installments</th>
+                    <th>Monthly Due</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="plan : ${plans}">
+                    <td class="plan-id" th:text="${plan.id}">PLAN-101</td>
+                    <td th:text="${plan.customer}">Alice Smith</td>
+                    <td th:text="'$' + ${#numbers.formatDecimal(plan.totalAmount, 1, 'COMMA', 2, 'POINT')}">$1,200.00</td>
+                    <td th:text="${plan.installments}">12</td>
+                    <td th:text="'$' + ${#numbers.formatDecimal(plan.monthlyDue, 1, 'COMMA', 2, 'POINT')}">$100.00</td>
+                    <td>
+                        <span th:class="'badge badge-' + ${#strings.toLowerCase(plan.status)}" th:text="${plan.status}">ACTIVE</span>
+                    </td>
+                    <td>
+                        <form th:if="${plan.status != 'PAID'}" th:action="@{'/dashboard/pay/' + ${plan.id}}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn-pay" th:id="'pay-' + ${plan.id}">Pay Now</button>
+                        </form>
+                        <span th:if="${plan.status == 'PAID'}" style="color: #64748b; font-size: 0.85rem;">Completed</span>
+
+                        <form th:action="@{'/dashboard/delete/' + ${plan.id}}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn-delete" th:id="'delete-' + ${plan.id}">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

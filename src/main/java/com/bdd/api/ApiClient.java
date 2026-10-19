@@ -38,35 +38,53 @@ public class ApiClient {
     }
 
     public void setAuthToken(String token) {
-        this.requestSpec.header("Authorization", "Bearer " + token);
+        if (token != null) {
+            this.requestSpec.header("Authorization", "Bearer " + token);
+        }
+    }
+
+    public void clearAuthToken() {
+        this.requestSpec = new RequestSpecBuilder()
+                .setBaseUri(this.baseUri)
+                .setContentType(ContentType.JSON)
+                .setAccept(ContentType.JSON)
+                .build();
     }
 
     public void setBasicAuth(String username, String password) {
         this.requestSpec.auth().preemptive().basic(username, password);
     }
 
+    private String resolveEndpoint(String endpoint) {
+        if (endpoint == null) return "";
+        if (this.baseUri != null && this.baseUri.endsWith("/api") && endpoint.startsWith("/api/")) {
+            return endpoint.substring(4);
+        }
+        return endpoint;
+    }
+
     public Response get(String endpoint) {
-        return given().spec(requestSpec).when().get(endpoint);
+        return given().spec(requestSpec).when().get(resolveEndpoint(endpoint));
     }
 
     public Response get(String endpoint, Map<String, ?> queryParams) {
-        return given().spec(requestSpec).queryParams(queryParams).when().get(endpoint);
+        return given().spec(requestSpec).queryParams(queryParams).when().get(resolveEndpoint(endpoint));
     }
 
     public Response post(String endpoint, Object body) {
-        return given().spec(requestSpec).body(body).when().post(endpoint);
+        return given().spec(requestSpec).body(body).when().post(resolveEndpoint(endpoint));
     }
 
     public Response put(String endpoint, Object body) {
-        return given().spec(requestSpec).body(body).when().put(endpoint);
+        return given().spec(requestSpec).body(body).when().put(resolveEndpoint(endpoint));
     }
 
     public Response patch(String endpoint, Object body) {
-        return given().spec(requestSpec).body(body).when().patch(endpoint);
+        return given().spec(requestSpec).body(body).when().patch(resolveEndpoint(endpoint));
     }
 
     public Response delete(String endpoint) {
-        return given().spec(requestSpec).when().delete(endpoint);
+        return given().spec(requestSpec).when().delete(resolveEndpoint(endpoint));
     }
 
     public String getBaseUri() {

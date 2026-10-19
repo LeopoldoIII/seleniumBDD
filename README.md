@@ -4,7 +4,138 @@ Enterprise-grade test automation framework built for **Web UI**, **REST API**, *
 
 ---
 
+## ⚡ Quick Start & Common Usage Commands
+
+This section provides a quick copy-paste cheat-sheet for running the application under test (AUT) and executing automated test suites.
+
+### 1. Prerequisites Check
+Ensure your environment meets the minimum version requirements:
+```bash
+java -version    # Java 21+ required
+mvn -version     # Apache Maven 3.9+ required
+docker --version # Docker 24+ (optional, for containerized run)
+```
+
+---
+
+### 2. Starting the Application Under Test (AUT)
+
+Choose between **Local Mode (H2 file database)** or **Containerized Mode (Docker + PostgreSQL 16)**:
+
+#### Option A: Local Spring Boot 3 (Fastest, zero Docker dependencies)
+```bash
+# Start Spring Boot backend on http://localhost:8080 (in background or new terminal)
+cd backend && mvn spring-boot:run
+```
+
+#### Option B: Full Docker Compose (Spring Boot + PostgreSQL 16)
+```bash
+# Build and run containers in detached mode
+docker compose up -d --build
+
+# Verify container health and logs
+docker compose ps
+curl http://localhost:8080/actuator/health
+
+# Stop and wipe container volumes when finished
+docker compose down -v
+```
+
+---
+
+### 3. Running Automated UI Tests (Selenium + TestNG + Cucumber)
+
+All UI tests run against `http://localhost:8080` by default.
+
+```bash
+# Run all UI tests (Login, Installments CRUD, and Security Redirects) in headless mode
+mvn clean test -Dtest=UiTestRunner -Dheadless=true
+
+# Run UI tests visually (opens Chrome browser window)
+mvn test -Dtest=UiTestRunner -Dheadless=false
+
+# Run a specific UI feature file directly
+mvn test -Dtest=UiTestRunner -Dcucumber.features="src/test/resources/features/UI/installments.feature" -Dheadless=true
+
+# Run by Cucumber Tag (e.g. Smoke tests only)
+mvn test -Dtest=UiTestRunner -Dcucumber.filter.tags="@smoke" -Dheadless=true
+
+# Run cross-browser on Firefox
+mvn test -Dtest=UiTestRunner -Dbrowser=firefox -Dheadless=true
+
+# Re-run ONLY failed UI scenarios from previous build
+mvn test -Dtest=FailedUiTestRunner
+```
+
+---
+
+### 4. Running Automated REST API Tests (REST Assured + JWT)
+
+API tests validate Spring Security JWT issuance, bearer token authentication, and full CRUD operations.
+
+```bash
+# Run all API tests
+mvn clean test -Dtest=ApiTestRunner
+
+# Run only JWT Authentication & Authorization tests
+mvn test -Dtest=ApiTestRunner -Dcucumber.filter.tags="@jwt"
+
+# Run only CRUD & Database SQL verification tests
+mvn test -Dtest=ApiTestRunner -Dcucumber.filter.tags="@crud"
+
+# Override API Base URI dynamically
+mvn test -Dtest=ApiTestRunner -Dapi.baseUri=http://localhost:8080/api
+```
+
+---
+
+### 5. Running Cloud & Mobile Tests
+
+```bash
+# Run on Sauce Labs Cloud (Chrome)
+mvn test -Dtest=UiTestRunner \
+  -Dexecution=saucelabs \
+  -Dsaucelabs.username="YOUR_USER" \
+  -Dsaucelabs.accessKey="YOUR_KEY"
+
+# Run Mobile on Local Android Emulator (via Appium)
+mvn test -Dtest=UiTestRunner -Dtarget=mobile -Dmobile.platformName=Android
+```
+
+---
+
+### 7. Database Credentials & H2 Web Console
+
+The application supports both local H2 and containerized PostgreSQL databases with pre-seeded users and relational tables (`users`, `installment_plans`, `payments`):
+
+#### Database Connections
+| Property | Local (H2 Database) | Docker (PostgreSQL 16) |
+| :--- | :--- | :--- |
+| **JDBC URL** | `jdbc:h2:file:./backend/data/testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;AUTO_SERVER=TRUE` | `jdbc:postgresql://localhost:5432/installments_db` |
+| **Username** | `db_user` | `db_user` |
+| **Password** | `db_password123` | `db_password123` |
+| **Driver Class** | `org.h2.Driver` | `org.postgresql.Driver` |
+| **Web Console** | `http://localhost:8080/h2-console` | (Use pgAdmin or psql) |
+
+#### H2 Web Console Access Guide
+1. Start the Spring Boot backend (`cd backend && mvn spring-boot:run`).
+2. Open `http://localhost:8080/h2-console` in your browser.
+3. Set **JDBC URL** to: `jdbc:h2:file:./data/testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;AUTO_SERVER=TRUE`
+4. Set **User Name** to: `db_user`
+5. Set **Password** to: `db_password123`
+6. Click **Connect** to query tables (`SELECT * FROM installment_plans;`, `SELECT * FROM payments;`, `SELECT * FROM users;`).
+
+#### Application Test Users (Web UI & API JWT)
+| Username | Password | Role | Description |
+| :--- | :--- | :--- | :--- |
+| `testuser@example.com` | `testpassword` | `ROLE_USER` | Standard customer account for smoke & regression tests |
+| `admin@example.com` | `adminpassword123` | `ROLE_ADMIN` | Administrator account with elevated privileges |
+| `auditor@example.com` | `auditor123` | `ROLE_AUDITOR` | Read-only auditor account |
+
+---
+
 ## 📑 Table of Contents
+0. [⚡ Quick Start & Common Usage Commands](#-quick-start--common-usage-commands)
 1. [Execution Matrix (All CLI Combinations)](#1-execution-matrix-all-cli-combinations)
 2. [TestNG Architecture & Lifecycle Deep Dive](#2-testng-architecture--lifecycle-deep-dive)
 3. [The 4 OOP Pillars in Java: Corporate & Framework Examples](#3-the-4-oop-pillars-in-java-corporate--framework-examples)
@@ -50,19 +181,37 @@ mvn test -Dtest=UiTestRunner -Dcucumber.features="src/test/resources/features/UI
 mvn test -Dtest=UiTestRunner -Ddataproviderthreadcount=4
 ```
 
-### B. REST API Execution (REST Assured)
+### B. REST API Execution (REST Assured + JWT)
 ```bash
 # 1. Run all API scenarios (does not launch browser instances)
 mvn clean test -Dtest=ApiTestRunner
 
-# 2. Override API Base URI dynamically
-mvn test -Dtest=ApiTestRunner -Dapi.baseUri=http://localhost:8080/api
+# 2. Run Spring Boot Security JWT scenarios (Login, 401/403 access control)
+mvn test -Dtest=ApiTestRunner -Dcucumber.filter.tags="@jwt"
 
-# 3. Filter specific API tag (e.g., local mock endpoint validations)
-mvn test -Dtest=ApiTestRunner -Dcucumber.filter.tags="@local"
+# 3. Run full CRUD API scenarios with PostgreSQL / H2 database assertions
+mvn test -Dtest=ApiTestRunner -Dcucumber.filter.tags="@crud"
+
+# 4. Override API Base URI dynamically
+mvn test -Dtest=ApiTestRunner -Dapi.baseUri=http://localhost:8080/api
 ```
 
-### C. Cloud Execution (Sauce Labs)
+### C. Docker & Microservice Execution
+```bash
+# 1. Run Spring Boot 3 locally with H2 in-memory/file database:
+cd backend && mvn spring-boot:run
+
+# 2. Start PostgreSQL 16 and Spring Boot 3 in Docker containers:
+docker compose up -d --build
+
+# 3. Check backend health in Docker:
+curl http://localhost:8080/actuator/health
+
+# 4. Stop Docker containers:
+docker compose down -v
+```
+
+### D. Cloud Execution (Sauce Labs)
 ```bash
 # 1. Desktop Web on Sauce Labs (Chrome)
 mvn test -Dtest=UiTestRunner \
@@ -360,10 +509,23 @@ The framework includes [RetryAnalyzer.java](file:///Users/user/Local/projects/se
 seleniumBDD/
 ├── pom.xml                               # Dependencies (Selenium, Appium, Cucumber, TestNG, REST Assured)
 ├── README.md                             # Comprehensive Framework Reference Guide
+├── docker-compose.yml                    # Multi-container orchestration (PostgreSQL 16 + Spring Boot 3)
+├── backend/                              # Dedicated Spring Boot 3 Microservice (AUT)
+│   ├── pom.xml                           # Spring Boot 3, Spring Security 6, JJWT, JPA, Thymeleaf
+│   ├── Dockerfile                        # Multi-stage container build
+│   └── src/main/
+│       ├── java/com/installments/backend/
+│       │   ├── config/                   # SecurityConfig, JwtTokenProvider, JwtAuthenticationFilter
+│       │   ├── controller/               # AuthController, PlanController, WebUiController
+│       │   ├── model/                    # User, InstallmentPlan, AuthRequest, AuthResponse, PlanDto
+│       │   └── repository/               # UserRepository, InstallmentPlanRepository
+│       └── resources/
+│           ├── application.yml           # Multi-profile config (local H2 / docker PostgreSQL)
+│           └── templates/                # login.html, dashboard.html
 ├── src/
 │   ├── main/
 │   │   ├── java/com/bdd/
-│   │   │   ├── api/ApiClient.java        # Centralized REST Assured client
+│   │   │   ├── api/ApiClient.java        # Centralized REST Assured client (JWT Bearer support)
 │   │   │   ├── config/ConfigReader.java  # Multi-level hierarchical configuration reader
 │   │   │   ├── core/
 │   │   │   │   ├── DriverManager.java    # ThreadLocal<WebDriver> lifecycle
@@ -382,7 +544,6 @@ seleniumBDD/
 │   └── test/
 │       ├── java/com/bdd/
 │       │   ├── hooks/Hooks.java          # Screenshots on failure & SauceLabs reporting
-│       │   ├── mock/MockInstallmentsServer.java # Simulates installments.jar on port 8080
 │       │   ├── runners/
 │       │   │   ├── UiTestRunner.java     # Primary parallel TestNG runner
 │       │   │   ├── FailedUiTestRunner.java # Dedicated runner for re-executing failed tests
@@ -391,4 +552,6 @@ seleniumBDD/
 │       │   └── utils/
 │       │       └── RetryAnalyzer.java    # TestNG flaky test retry analyzer
 │       └── resources/features/           # Gherkin feature files (UI/ and API/)
+│           ├── UI/                       # login.feature, installments.feature
+│           └── API/                      # api.feature, auth_jwt.feature, crud_plans.feature
 ```

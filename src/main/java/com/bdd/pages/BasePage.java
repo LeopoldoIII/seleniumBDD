@@ -212,7 +212,7 @@ public class BasePage {
     }
 
     public String getTableCellText(By tableLocator, int rowIndex, int colIndex) {
-        WebElement table = waitForVisibility(driver.findElement(tableLocator));
+        WebElement table = wait.until(ExpectedConditions.visibilityOfElementLocated(tableLocator));
         String xpath = ".//tbody/tr[" + rowIndex + "]/td[" + colIndex + "]";
         List<WebElement> cells = table.findElements(By.xpath(xpath));
         if (cells.isEmpty()) {
@@ -222,14 +222,24 @@ public class BasePage {
     }
 
     public int findRowIndexContainingText(By tableLocator, String targetText) {
-        WebElement table = waitForVisibility(driver.findElement(tableLocator));
-        List<WebElement> rows = table.findElements(By.xpath(".//tbody/tr"));
-        if (rows.isEmpty()) {
-            rows = table.findElements(By.xpath(".//tr"));
-        }
-        for (int i = 0; i < rows.size(); i++) {
-            if (rows.get(i).getText().contains(targetText)) {
-                return i + 1; // 1-based index
+        for (int attempt = 0; attempt < 3; attempt++) {
+            try {
+                WebElement table = wait.until(ExpectedConditions.visibilityOfElementLocated(tableLocator));
+                List<WebElement> rows = table.findElements(By.xpath(".//tbody/tr"));
+                if (rows.isEmpty()) {
+                    rows = table.findElements(By.xpath(".//tr"));
+                }
+                for (int i = 0; i < rows.size(); i++) {
+                    if (rows.get(i).getText().contains(targetText)) {
+                        return i + 1; // 1-based index
+                    }
+                }
+                return -1;
+            } catch (WebDriverException e) {
+                // DOM is re-rendering, retry on next loop iteration
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException ignored) {}
             }
         }
         return -1;

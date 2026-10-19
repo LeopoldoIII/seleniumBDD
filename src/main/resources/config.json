@@ -36,9 +36,9 @@
     }
   },
   "database": {
-    "url": "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1",
-    "username": "sa",
-    "password": "",
+    "url": "jdbc:h2:file:./backend/data/testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;AUTO_SERVER=TRUE",
+    "username": "db_user",
+    "password": "db_password123",
     "driver": "org.h2.Driver"
   }
 }

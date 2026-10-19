@@ -3,7 +3,8 @@ Feature: API Testing with Rest Assured
 
   @smoke @local
   Scenario: Query seeded installment plan via REST API
-    Given I have the API endpoint "http://localhost:8080/api/plans/PLAN-101"
+    Given I authenticate with username "testuser@example.com" and password "testpassword"
+    And I have the API endpoint "/api/plans/PLAN-101"
     When I send a GET request
     Then the response status should be 200
     And the response field "id" should be "PLAN-101"
