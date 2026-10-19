@@ -2,6 +2,7 @@ package com.bdd.core.driver;
 
 public enum ExecutionTarget {
     LOCAL,
+    GRID,
     SAUCELABS;
 
     public static ExecutionTarget fromString(String target) {

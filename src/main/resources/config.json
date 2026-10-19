@@ -8,6 +8,10 @@
   "username": "testuser@example.com",
   "password": "testpassword",
   "timeout": 10,
+  "gridHubUrl": "http://localhost:4444/wd/hub",
+  "download": {
+    "directory": "target/downloads"
+  },
   "api": {
     "baseUri": "http://localhost:8080/api"
   },

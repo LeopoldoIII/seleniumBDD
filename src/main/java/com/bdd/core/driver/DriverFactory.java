@@ -11,8 +11,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -22,7 +24,7 @@ import java.util.Map;
 
 /**
  * Factory class responsible for creating Web and Mobile drivers,
- * supporting both Local execution and Sauce Labs cloud execution.
+ * supporting Local execution, Selenium Grid, and Sauce Labs cloud execution.
  */
 public class DriverFactory {
 
@@ -43,6 +45,8 @@ public class DriverFactory {
 
         if (execution == ExecutionTarget.SAUCELABS) {
             return createSauceLabsWebDriver(driverType);
+        } else if (execution == ExecutionTarget.GRID) {
+            return createGridWebDriver(driverType);
         } else {
             return createLocalWebDriver(driverType);
         }
@@ -69,6 +73,29 @@ public class DriverFactory {
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(ConfigReader.getTimeout()));
         driver.manage().window().maximize();
         return driver;
+    }
+
+    private static WebDriver createGridWebDriver(DriverType driverType) {
+        try {
+            URL gridUrl = URI.create(ConfigReader.getGridHubUrl()).toURL();
+            RemoteWebDriver driver;
+            if (driverType == DriverType.FIREFOX) {
+                FirefoxOptions options = new FirefoxOptions();
+                if (ConfigReader.isHeadless()) {
+                    options.addArguments("-headless");
+                }
+                driver = new RemoteWebDriver(gridUrl, options);
+            } else {
+                ChromeOptions options = getChromeOptions();
+                driver = new RemoteWebDriver(gridUrl, options);
+            }
+            driver.setFileDetector(new LocalFileDetector());
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(ConfigReader.getTimeout()));
+            driver.manage().window().maximize();
+            return driver;
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Invalid Selenium Grid Hub URL: " + e.getMessage(), e);
+        }
     }
 
     private static WebDriver createSauceLabsWebDriver(DriverType driverType) {
@@ -151,10 +178,19 @@ public class DriverFactory {
         } else {
             options.addArguments("--disable-extensions");
             options.addArguments("--disable-popup-blocking");
-            Map<String, Object> prefs = new HashMap<>();
-            prefs.put("profile.default_content_settings.popups", 0);
-            options.setExperimentalOption("prefs", prefs);
         }
+
+        Map<String, Object> prefs = new HashMap<>();
+        prefs.put("profile.default_content_settings.popups", 0);
+        File downloadDir = new File(ConfigReader.getDownloadDirectory());
+        if (!downloadDir.exists()) {
+            downloadDir.mkdirs();
+        }
+        prefs.put("download.default_directory", downloadDir.getAbsolutePath());
+        prefs.put("download.prompt_for_download", false);
+        prefs.put("download.directory_upgrade", true);
+        options.setExperimentalOption("prefs", prefs);
+
         options.addArguments("--ignore-certificate-errors");
         options.addArguments("--remote-allow-origins=*");
         return options;

@@ -126,8 +126,14 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
+                    <properties>
+                        <property>
+                            <name>listener</name>
+                            <value>com.bdd.utils.RetryListener</value>
+                        </property>
+                    </properties>
                     <includes>
-                        <include>**/TestRunner.java</include>
+                        <include>**/*Runner.java</include>
                     </includes>
                 </configuration>
             </plugin>

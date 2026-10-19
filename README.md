@@ -89,7 +89,18 @@ mvn test -Dtest=ApiTestRunner -Dapi.baseUri=http://localhost:8080/api
 
 ---
 
-### 5. Running Cloud & Mobile Tests
+### 5. Running on Selenium Grid & Remote Hubs
+```bash
+# Run tests against a remote Selenium Grid hub with LocalFileDetector enabled
+mvn test -Dtest=UiTestRunner -Dexecution=grid -Dgrid.hubUrl=http://localhost:4444/wd/hub
+
+# Run tests in parallel across Selenium Grid nodes on Firefox
+mvn test -Dtest=UiTestRunner -Dexecution=grid -Dbrowser=firefox -Dheadless=true
+```
+
+---
+
+### 6. Running Cloud & Mobile Tests
 
 ```bash
 # Run on Sauce Labs Cloud (Chrome)
@@ -98,8 +109,11 @@ mvn test -Dtest=UiTestRunner \
   -Dsaucelabs.username="YOUR_USER" \
   -Dsaucelabs.accessKey="YOUR_KEY"
 
-# Run Mobile on Local Android Emulator (via Appium)
+# Run Mobile on Local Android Emulator (via Appium 9+)
 mvn test -Dtest=UiTestRunner -Dtarget=mobile -Dmobile.platformName=Android
+
+# Run Mobile on iOS Simulator (via XCUITest)
+mvn test -Dtest=UiTestRunner -Dtarget=mobile -Dmobile.platformName=iOS
 ```
 
 ---
@@ -408,7 +422,71 @@ mvn test -Dtest=UiTestRunner -Dtarget=mobile -Dmobile.platformName=Android
 mvn test -Dtest=UiTestRunner -Dtarget=mobile -Dmobile.platformName=iOS
 ```
 
-Because `AndroidDriver` and `IOSDriver` implement `WebDriver`, **Page Objects extending `BasePage` can be reused across Web and Mobile**.
+### Tri-Platform Unified Page Object Model (POM)
+Thanks to `AppiumFieldDecorator` in [BasePage.java](file:///Users/usermone/local/projects/seleniumBDD/src/main/java/com/bdd/pages/BasePage.java), a single Page Object class serves Web UI, Android Native, and iOS Native simultaneously:
+
+```java
+public class UnifiedLoginPage extends BasePage {
+
+    @FindBy(id = "username")
+    @AndroidFindBy(id = "com.example.app:id/input_username")
+    @iOSXCUITFindBy(accessibility = "input_username")
+    private WebElement usernameInput;
+
+    @FindBy(id = "password")
+    @AndroidFindBy(id = "com.example.app:id/input_password")
+    @iOSXCUITFindBy(accessibility = "input_password")
+    private WebElement passwordInput;
+
+    @FindBy(id = "loginButton")
+    @AndroidFindBy(id = "com.example.app:id/btn_login")
+    @iOSXCUITFindBy(accessibility = "btn_login")
+    private WebElement loginButton;
+
+    public void login(String user, String pass) {
+        type(usernameInput, user);
+        type(passwordInput, pass);
+        click(loginButton);
+        hideKeyboard();
+    }
+}
+```
+
+### Modern W3C Mobile Gestures (`MobileGestureHelper`)
+Appium 9 replaces legacy `TouchAction` with W3C Pointer actions:
+```java
+MobileGestureHelper gestures = new MobileGestureHelper(driver);
+
+// Swipe up / down by percentage
+gestures.swipe(Direction.UP, 0.5);
+
+// Scroll down repeatedly until text is visible
+WebElement element = gestures.scrollToText("Submit Order");
+
+// Long press on an element
+gestures.longPress(element, Duration.ofSeconds(2));
+
+// Drag and drop between elements or coordinates
+gestures.dragAndDrop(sourceElement, targetElement);
+
+// Network emulation (Android/Emulators)
+gestures.setAirplaneMode(true);
+```
+
+### Hybrid Apps & Context Switching (WebView / Native)
+When your mobile app opens an in-app browser or WebView (SSO, payments, Terms of Service):
+```java
+// Inside any Page Object extending BasePage:
+switchToWebView();          // Switches to active WEBVIEW context
+click(paymentButton);       // Interacts with web elements inside the app
+switchToNativeApp();        // Returns seamlessly to NATIVE_APP
+```
+
+### Failure Diagnostics & Enterprise Utilities
+- **Browser Console Logs & Video Recording** ([Hooks.java](file:///Users/usermone/local/projects/seleniumBDD/src/test/java/com/bdd/hooks/Hooks.java)): On scenario failure, JavaScript console errors (`LogType.BROWSER`) and mobile MP4 video recordings are automatically attached to the Cucumber HTML report.
+- **File Download Manager** ([FileManager.java](file:///Users/usermone/local/projects/seleniumBDD/src/main/java/com/bdd/utils/FileManager.java)): Polls and verifies PDF, CSV, and Excel downloads in headless and remote Grid environments.
+- **Dynamic Test Data** ([TestDataUtils.java](file:///Users/usermone/local/projects/seleniumBDD/src/main/java/com/bdd/utils/TestDataUtils.java)): Generates collision-free timestamped emails, unique IDs, and relative dates (`getPastDate(30)`, `getFutureDate(15)`).
+- **Auto-Retry Listener** ([RetryListener.java](file:///Users/usermone/local/projects/seleniumBDD/src/test/java/com/bdd/utils/RetryListener.java)): Binds TestNG's `RetryAnalyzer` dynamically to automatically retry failed tests.
 
 ---
 

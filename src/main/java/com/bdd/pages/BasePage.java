@@ -9,12 +9,20 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.HidesKeyboard;
+import io.appium.java_client.InteractsWithApps;
+import io.appium.java_client.pagefactory.AppiumFieldDecorator;
+import io.appium.java_client.remote.SupportsContextSwitching;
+
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Robust BasePage ("Navaja Suiza") providing resilient interaction with web and mobile UI components:
- * inputs, dropdowns, dynamic tables, modals, alerts, scrolling, and JavaScript fallbacks.
+ * inputs, dropdowns, dynamic tables, modals, alerts, scrolling, JavaScript fallbacks,
+ * hybrid WebView context switching, app lifecycle management, and AppiumFieldDecorator.
  */
 public class BasePage {
 
@@ -29,7 +37,8 @@ public class BasePage {
         this.wait = new WebDriverWait(this.driver, Duration.ofSeconds(timeoutSeconds));
         this.actions = new Actions(this.driver);
         this.js = (JavascriptExecutor) this.driver;
-        PageFactory.initElements(this.driver, this);
+        // AppiumFieldDecorator supports @FindBy, @AndroidFindBy, and @iOSXCUITFindBy simultaneously
+        PageFactory.initElements(new AppiumFieldDecorator(this.driver, Duration.ofSeconds(timeoutSeconds)), this);
     }
 
     public BasePage() {
@@ -299,5 +308,116 @@ public class BasePage {
 
     public boolean waitForTextPresent(WebElement element, String text) {
         return wait.until(ExpectedConditions.textToBePresentInElement(element, text));
+    }
+
+    // ==========================================
+    // Deep Linking & Mobile Navigation
+    // ==========================================
+
+    /**
+     * Navigates directly via deep link URL (e.g. "myapp://orders/123" or https deeplink).
+     */
+    public void openDeepLink(String deepLinkUrl) {
+        if (deepLinkUrl != null && !deepLinkUrl.isEmpty()) {
+            driver.get(deepLinkUrl);
+        }
+    }
+
+    // ==========================================
+    // Hybrid Apps & Context Switching (WebView / Native)
+    // ==========================================
+
+    /**
+     * Switches context to the first available WEBVIEW context (for hybrid apps, OAuth, payment gateways).
+     */
+    public void switchToWebView() {
+        if (driver instanceof SupportsContextSwitching) {
+            SupportsContextSwitching contextDriver = (SupportsContextSwitching) driver;
+            Set<String> contexts = contextDriver.getContextHandles();
+            for (String context : contexts) {
+                if (context.toUpperCase().contains("WEBVIEW")) {
+                    contextDriver.context(context);
+                    return;
+                }
+            }
+            throw new NoSuchContextException("No WEBVIEW context found. Available contexts: " + contexts);
+        }
+    }
+
+    /**
+     * Switches context to a specific context containing target string.
+     */
+    public void switchToContext(String partialContextName) {
+        if (driver instanceof SupportsContextSwitching) {
+            SupportsContextSwitching contextDriver = (SupportsContextSwitching) driver;
+            Set<String> contexts = contextDriver.getContextHandles();
+            for (String context : contexts) {
+                if (context.toUpperCase().contains(partialContextName.toUpperCase())) {
+                    contextDriver.context(context);
+                    return;
+                }
+            }
+            throw new NoSuchContextException("Context containing '" + partialContextName + "' not found. Available: " + contexts);
+        }
+    }
+
+    /**
+     * Switches back to the native application context (NATIVE_APP).
+     */
+    public void switchToNativeApp() {
+        if (driver instanceof SupportsContextSwitching) {
+            ((SupportsContextSwitching) driver).context("NATIVE_APP");
+        }
+    }
+
+    public String getCurrentContext() {
+        if (driver instanceof SupportsContextSwitching) {
+            return ((SupportsContextSwitching) driver).getContext();
+        }
+        return "NATIVE_APP";
+    }
+
+    // ==========================================
+    // Mobile App Lifecycle & Keyboard
+    // ==========================================
+
+    /**
+     * Minimizes app to background for specified duration and brings it back to foreground.
+     */
+    public void runAppInBackground(Duration duration) {
+        if (driver instanceof InteractsWithApps) {
+            ((InteractsWithApps) driver).runAppInBackground(duration);
+        }
+    }
+
+    /**
+     * Terminates the app with given package / bundle ID.
+     */
+    public void terminateApp(String bundleOrPackageId) {
+        if (driver instanceof InteractsWithApps) {
+            ((InteractsWithApps) driver).terminateApp(bundleOrPackageId);
+        }
+    }
+
+    /**
+     * Activates the app with given package / bundle ID.
+     */
+    public void activateApp(String bundleOrPackageId) {
+        if (driver instanceof InteractsWithApps) {
+            ((InteractsWithApps) driver).activateApp(bundleOrPackageId);
+        }
+    }
+
+    /**
+     * Safely hides software keyboard if active.
+     */
+    public void hideKeyboard() {
+        if (driver instanceof HidesKeyboard) {
+            try {
+                ((HidesKeyboard) driver).hideKeyboard();
+            } catch (Exception ignored) {
+                // Keyboard might already be closed or not dismissible
+            }
+        }
     }
 }

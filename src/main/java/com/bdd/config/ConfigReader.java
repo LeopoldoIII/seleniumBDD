@@ -223,4 +223,18 @@ public class ConfigReader {
     public static String getDatabaseDriver() {
         return getProperty("database.driver");
     }
+
+    // Convenience Getters for Selenium Grid
+    public static String getGridHubUrl() {
+        String hub = getProperty("grid.hubUrl");
+        if (hub == null || hub.isEmpty()) {
+            hub = getProperty("gridHubUrl");
+        }
+        return (hub != null && !hub.isEmpty()) ? hub : "http://localhost:4444/wd/hub";
+    }
+
+    public static String getDownloadDirectory() {
+        String dir = getProperty("download.directory");
+        return (dir != null && !dir.isEmpty()) ? dir : "target/downloads";
+    }
 }
