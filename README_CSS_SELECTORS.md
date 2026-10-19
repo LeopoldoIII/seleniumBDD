@@ -1,112 +1,112 @@
-# 🎯 Guía Maestra de Selectores CSS e ID para Selenium & Automatización
+# 🎯 Master Guide to CSS & ID Selectors for Selenium & Automation
 
-> **Cheat Sheet & Acordeón de Consulta Rápida**  
-> Documento interactivo con todas las posibles combinaciones de selectores CSS, sintaxis por ID, atributos, combinadores, pseudo-clases y ejemplos listos para copiar en Selenium Java (`@FindBy` y `By.cssSelector`).
+> **Interactive Cheat Sheet & Accordion Reference**  
+> Complete guide with all possible CSS selector combinations, ID syntax, attributes, combinators, pseudo-classes, and production-ready examples for Selenium Java (`@FindBy` and `By.cssSelector`).
 
 ---
 
-## 📑 Tabla de Contenido (Acordeón)
+## 📑 Table of Contents (Accordion)
 
-> Haz clic en cada sección para desplegar u ocultar los ejemplos y combinaciones.
+> Click on each section to expand or collapse examples and selector combinations.
 
 <details>
-<summary><b>1. Selectores Básicos: ID, Tag, Clase y Universal</b></summary>
+<summary><b>1. Basic Selectors: ID, Tag, Class, and Universal</b></summary>
 <br>
 
-Los cimientos de los selectores CSS.
+The foundation of CSS selectors.
 
-| Sintaxis CSS | Descripción | Ejemplo HTML objetivo |
+| CSS Syntax | Description | Target HTML Example |
 | :--- | :--- | :--- |
-| `#id` | Elemento con un ID específico | `<input id="username">` |
-| `tag#id` | Etiqueta específica con ese ID | `<input id="username">` |
-| `.clase` | Elemento con una clase específica | `<button class="btn">` |
-| `tag.clase` | Etiqueta específica con esa clase | `<button class="btn">` |
-| `.clase1.clase2` | Elemento que contiene **ambas** clases simultáneamente | `<button class="btn btn-primary">` |
-| `*` | Cualquier elemento (universal) | Todo el DOM |
-| `tag` | Por nombre de etiqueta HTML | `<div>`, `<span>`, `<input>` |
+| `#id` | Element with a specific ID | `<input id="username">` |
+| `tag#id` | Specific tag with that ID | `<input id="username">` |
+| `.class` | Element with a specific class | `<button class="btn">` |
+| `tag.class` | Specific tag with that class | `<button class="btn">` |
+| `.class1.class2` | Element containing **both** classes simultaneously | `<button class="btn btn-primary">` |
+| `*` | Any element (universal wildcard) | Entire DOM |
+| `tag` | By HTML tag name | `<div>`, `<span>`, `<input>` |
 
-#### 💡 Ejemplos Prácticos
+#### 💡 Practical Examples
 
 ```html
-<!-- HTML de ejemplo -->
+<!-- Sample HTML -->
 <div id="login-container" class="auth-box card-shadow">
   <input type="text" id="user-email" class="form-control required-field" placeholder="Email">
-  <button id="btn-submit" class="btn btn-primary active">Ingresar</button>
+  <button id="btn-submit" class="btn btn-primary active">Sign In</button>
 </div>
 ```
 
 ```java
 // Selenium Java:
 @FindBy(css = "#user-email")
-private WebElement emailPorId;
+private WebElement emailById;
 
 @FindBy(css = "input#user-email")
-private WebElement emailPorTagEId;
+private WebElement emailByTagAndId;
 
 @FindBy(css = ".btn.btn-primary.active")
-private WebElement botonConMultiplesClases;
+private WebElement buttonWithMultipleClasses;
 
 @FindBy(css = "div.auth-box.card-shadow")
-private WebElement contenedorConTagYDosClases;
+private WebElement containerWithTagAndTwoClasses;
 ```
 
-> **Regla de oro con clases múltiples:**  
-> Si un elemento tiene `class="btn btn-primary active"`, en CSS se encadenan con puntos sin espacios: `.btn.btn-primary.active`. Si pones un espacio (`.btn .btn-primary`), buscará un hijo, no el mismo elemento.
+> **Golden rule with multiple classes:**  
+> If an element has `class="btn btn-primary active"`, chain them with dots without spaces: `.btn.btn-primary.active`. If you insert a space (`.btn .btn-primary`), it will search for a descendant child, not the element itself.
 
 </details>
 
 ---
 
 <details>
-<summary><b>2. Selectores de Atributos: Exactos, Parciales e IDs Dinámicos</b></summary>
+<summary><b>2. Attribute Selectors: Exact, Partial, and Dynamic IDs</b></summary>
 <br>
 
-Ideales cuando los IDs cambian en cada recarga (dinámicos) o para aprovechar atributos de testing (`data-testid`, `name`, `type`, `placeholder`).
+Essential when IDs change across page reloads (dynamic IDs) or to leverage dedicated QA hooks (`data-testid`, `name`, `type`, `placeholder`).
 
-| Operador | Significado | Ejemplo Selector | Coincide con... |
+| Operator | Meaning | Example Selector | Matches... |
 | :---: | :--- | :--- | :--- |
-| `[attr='val']` | Valor **exacto** | `[data-testid='login-btn']` | `data-testid="login-btn"` |
-| `[attr^='val']` | **Comienza con** (Prefijo) | `[id^='session_']` | `id="session_12345"`, `id="session_abc"` |
-| `[attr$='val']` | **Termina con** (Sufijo) | `[id$='_input']` | `id="username_input"`, `id="987_input"` |
-| `[attr*='val']` | **Contiene** la subcadena | `[class*='alert-danger']` | `class="box alert-danger-custom active"` |
-| `[attr~='val']` | Contiene la palabra exacta en lista separada por espacios | `[class~='primary']` | `class="btn primary large"` |
-| `[attr\|='val']` | Empieza con el valor o con `val-` | `[lang\|='es']` | `lang="es"`, `lang="es-MX"` |
-| `[attr]` | El elemento tiene el atributo presente (sin importar su valor) | `input[disabled]`, `[required]` | `<input required>`, `<button disabled>` |
-| `[attr='val' i]` | Insensible a mayúsculas/minúsculas | `[placeholder*='buscar' i]` | `placeholder="BUSCAR..."` |
+| `[attr='val']` | **Exact** value | `[data-testid='login-btn']` | `data-testid="login-btn"` |
+| `[attr^='val']` | **Starts with** (Prefix) | `[id^='session_']` | `id="session_12345"`, `id="session_abc"` |
+| `[attr$='val']` | **Ends with** (Suffix) | `[id$='_input']` | `id="username_input"`, `id="987_input"` |
+| `[attr*='val']` | **Contains** substring | `[class*='alert-danger']` | `class="box alert-danger-custom active"` |
+| `[attr~='val']` | Contains exact word in space-separated list | `[class~='primary']` | `class="btn primary large"` |
+| `[attr\|='val']` | Starts with value or `val-` | `[lang\|='en']` | `lang="en"`, `lang="en-US"` |
+| `[attr]` | Attribute is present (regardless of value) | `input[disabled]`, `[required]` | `<input required>`, `<button disabled>` |
+| `[attr='val' i]` | Case-insensitive matching | `[placeholder*='search' i]` | `placeholder="SEARCH..."` |
 
-#### 💡 Ejemplos Prácticos para IDs Dinámicos
+#### 💡 Practical Examples for Dynamic IDs
 
-En frameworks como Angular, React o Salesforce, los IDs suelen ser generados dinámicamente: `input-ember1234-field`, `ctrl_9823_email`.
+In modern frameworks (React, Angular, Salesforce), element IDs are often auto-generated: `input-ember1234-field`, `ctrl_9823_email`.
 
 ```html
-<!-- IDs generados dinámicamente -->
+<!-- Dynamically generated IDs -->
 <input id="usr_9281736_txt" name="username" data-test="user-input" required>
-<button id="btn_submit_99482" data-role="action-button">Aceptar</button>
-<div id="container-random123-body">Contenido</div>
+<button id="btn_submit_99482" data-role="action-button">Submit</button>
+<div id="container-random123-body">Content</div>
 ```
 
 ```java
 // Selenium Java:
 
-// Prefijo: ID que empieza con 'usr_'
+// Prefix: ID starting with 'usr_'
 @FindBy(css = "input[id^='usr_']")
-private WebElement usuarioIdDinamicoPrefijo;
+private WebElement dynamicUsernamePrefix;
 
-// Sufijo: Botón cuyo ID termina en '_txt'
+// Suffix: Input with ID ending in '_txt'
 @FindBy(css = "input[id$='_txt']")
-private WebElement usuarioIdDinamicoSufijo;
+private WebElement dynamicUsernameSuffix;
 
-// Contiene: Elemento cuyo ID contiene 'random'
+// Contains: ID containing substring 'random'
 @FindBy(css = "div[id*='random']")
-private WebElement contenedorIdDinamicoContiene;
+private WebElement dynamicContainerContains;
 
-// Por atributo de prueba dedicado (Best Practice)
+// Dedicated QA test hook (Industry Best Practice)
 @FindBy(css = "[data-test='user-input']")
-private WebElement usuarioPorDataTest;
+private WebElement usernameByDataTest;
 
-// Elemento que tiene el atributo 'required'
+// Input element with the 'required' attribute present
 @FindBy(css = "input[required]")
-private WebElement campoRequerido;
+private WebElement requiredInputField;
 ```
 
 </details>
@@ -114,24 +114,24 @@ private WebElement campoRequerido;
 ---
 
 <details>
-<summary><b>3. Combinación de Múltiples Atributos simultáneos (AND lógico)</b></summary>
+<summary><b>3. Multi-Attribute Combinations (Logical AND)</b></summary>
 <br>
 
-Cuando un solo atributo es ambiguo o se repite en la página, puedes encadenar 2 o más atributos juntos en el mismo selector.
+When a single attribute is ambiguous or duplicated across the page, chain 2 or more attributes together in the same selector.
 
-| Sintaxis | Descripción |
+| Syntax | Description |
 | :--- | :--- |
-| `tag[attr1='val1'][attr2='val2']` | Coincide si cumple la etiqueta Y ambos atributos |
-| `tag#id[attr='val']` | Coincide con el ID Y el atributo adicional |
-| `tag.clase[attr='val']` | Coincide con la clase Y el atributo |
-| `tag.clase[attr1*='val1'][attr2^='val2']` | Clase + atributo que contiene + atributo que empieza |
+| `tag[attr1='val1'][attr2='val2']` | Matches tag AND both attributes simultaneously |
+| `tag#id[attr='val']` | Matches specific ID AND additional attribute |
+| `tag.class[attr='val']` | Matches class AND attribute |
+| `tag.class[attr1*='val1'][attr2^='val2']` | Class + contains attribute + starts-with attribute |
 
-#### 💡 Ejemplos Prácticos
+#### 💡 Practical Examples
 
 ```html
 <form id="checkout-form">
-  <input type="text" name="address" class="input-field" placeholder="Calle 1" data-index="1">
-  <input type="text" name="address" class="input-field" placeholder="Calle 2" data-index="2">
+  <input type="text" name="address" class="input-field" placeholder="Line 1" data-index="1">
+  <input type="text" name="address" class="input-field" placeholder="Line 2" data-index="2">
   <input type="hidden" name="address" value="token_secret">
 </form>
 ```
@@ -139,17 +139,17 @@ Cuando un solo atributo es ambiguo o se repite en la página, puedes encadenar 2
 ```java
 // Selenium Java:
 
-// Solo el input de tipo texto que además tenga nombre 'address' y data-index '1'
+// Specific text input matching name 'address' AND data-index '1'
 @FindBy(css = "input[type='text'][name='address'][data-index='1']")
-private WebElement direccionPrincipal;
+private WebElement primaryAddressInput;
 
-// Input con clase 'input-field' que contenga 'Calle 2' en su placeholder
-@FindBy(css = "input.input-field[placeholder*='Calle 2']")
-private WebElement direccionSecundaria;
+// Input with class 'input-field' containing 'Line 2' in its placeholder
+@FindBy(css = "input.input-field[placeholder*='Line 2']")
+private WebElement secondaryAddressInput;
 
-// Tag + Clase + Tipo + Requerido
+// Tag + Class + Type + Required
 @FindBy(css = "input.input-field[type='text'][required]")
-private WebElement campoTextoObligatorio;
+private WebElement requiredTextField;
 ```
 
 </details>
@@ -157,42 +157,42 @@ private WebElement campoTextoObligatorio;
 ---
 
 <details>
-<summary><b>4. Combinadores Jerárquicos: Padres, Hijos y Hermanos</b></summary>
+<summary><b>4. Hierarchical Combinators: Parents, Children, and Siblings</b></summary>
 <br>
 
-Permiten navegar por el árbol DOM en función de la relación entre elementos.
+Navigate the DOM tree based on relationships between elements.
 
-| Símbolo | Tipo de Relación | Sintaxis | Explicación |
+| Symbol | Relationship | Syntax | Description |
 | :---: | :--- | :--- | :--- |
-| *(Espacio)* | **Descendiente** | `A B` | `B` está en cualquier nivel dentro de `A` (hijo, nieto, bisnieto) |
-| `>` | **Hijo Directo** | `A > B` | `B` es hijo inmediato de `A` (primer nivel únicamente) |
-| `+` | **Hermano Adyacente** | `A + B` | `B` es el elemento inmediatamente posterior a `A` al mismo nivel |
-| `~` | **Hermano General** | `A ~ B` | `B` es cualquier hermano que viene después de `A`, no necesariamente contiguo |
+| *(Space)* | **Descendant** | `A B` | `B` is inside `A` at any depth level (child, grandchild, etc.) |
+| `>` | **Direct Child** | `A > B` | `B` is an immediate first-level child of `A` |
+| `+` | **Adjacent Sibling** | `A + B` | `B` is the immediately following sibling after `A` at the same level |
+| `~` | **General Sibling** | `A ~ B` | `B` is any subsequent sibling following `A` (not necessarily adjacent) |
 
-#### 💡 Diagrama Visual de Relaciones
+#### 💡 Visual Relationship Diagram
 
 ```text
-div#padre
+div#parent
  │
- ├── p.hijo-1 (Hijo directo: div#padre > p.hijo-1)
- ├── p.hijo-2 (Hermano adyacente de hijo-1: p.hijo-1 + p.hijo-2)
+ ├── p.child-1 (Direct child: div#parent > p.child-1)
+ ├── p.child-2 (Adjacent sibling of child-1: p.child-1 + p.child-2)
  ├── ul
- │    └── li.nieto (Descendiente: div#padre li.nieto)
- └── p.hijo-3 (Hermano general de hijo-1: p.hijo-1 ~ p.hijo-3)
+ │    └── li.grandchild (Descendant: div#parent li.grandchild)
+ └── p.child-3 (General sibling of child-1: p.child-1 ~ p.child-3)
 ```
 
-#### 💡 Ejemplos Prácticos
+#### 💡 Practical Examples
 
 ```html
 <div id="modal-content" class="modal-body">
-  <h3>Título del Diálogo</h3>
-  <label for="pwd">Contraseña:</label>
+  <h3>Dialog Title</h3>
+  <label for="pwd">Password:</label>
   <input type="password" id="pwd" class="form-input">
-  <span class="error-msg">Contraseña obligatoria</span>
+  <span class="error-msg">Password is required</span>
   
   <div class="footer-actions">
-    <button class="btn btn-cancel">Cancelar</button>
-    <button class="btn btn-save">Guardar</button>
+    <button class="btn btn-cancel">Cancel</button>
+    <button class="btn btn-save">Save</button>
   </div>
 </div>
 ```
@@ -200,25 +200,25 @@ div#padre
 ```java
 // Selenium Java:
 
-// Descendiente: Cualquier botón dentro del modal con ID 'modal-content'
+// Descendant: Any save button inside the modal container
 @FindBy(css = "#modal-content button.btn-save")
-private WebElement botonGuardarEnModal;
+private WebElement saveButtonInModal;
 
-// Hijo directo: Botón que es hijo directo del footer
+// Direct child (>): Cancel button directly inside footer-actions
 @FindBy(css = "div.footer-actions > button.btn-cancel")
-private WebElement botonCancelarHijoDirecto;
+private WebElement cancelDirectChildButton;
 
-// Hermano adyacente (+): El input que está justo después de su <label>
+// Adjacent sibling (+): Input element placed immediately after its label
 @FindBy(css = "label[for='pwd'] + input")
-private WebElement inputInmediatoAlLabel;
+private WebElement inputImmediatelyAfterLabel;
 
-// Hermano adyacente (+): Mensaje de error justo después del input
+// Adjacent sibling (+): Error message placed immediately after the input
 @FindBy(css = "input#pwd + span.error-msg")
-private WebElement errorDespuesDePassword;
+private WebElement errorImmediatelyAfterPassword;
 
-// Hermano general (~): Cualquier botón que venga después del botón cancelar
+// General sibling (~): Any button following the cancel button
 @FindBy(css = "button.btn-cancel ~ button")
-private WebElement botonesPosterioresACancelar;
+private WebElement buttonsAfterCancel;
 ```
 
 </details>
@@ -226,32 +226,32 @@ private WebElement botonesPosterioresACancelar;
 ---
 
 <details>
-<summary><b>5. Pseudo-clases Estructurales e Índices: `nth-child`, `first-child`, `last-child`</b></summary>
+<summary><b>5. Structural Pseudo-Classes & Indexing: `nth-child`, `first-child`, `last-child`</b></summary>
 <br>
 
-Ideales para tablas, listas desplegables, tarjetas de productos o filas dinámicas.
+Ideal for tables, dropdown lists, product cards, or dynamic lists.
 
-| Pseudo-clase | Descripción | Ejemplo |
+| Pseudo-Class | Description | Example |
 | :--- | :--- | :--- |
-| `:first-child` | El primer hijo de su padre | `ul#menu > li:first-child` |
-| `:last-child` | El último hijo de su padre | `ul#menu > li:last-child` |
-| `:only-child` | Elemento que es el único hijo de su padre | `div.alert > span:only-child` |
-| `:nth-child(n)` | El hijo en la posición `n` (1-indexed) | `tr:nth-child(2)` *(Segunda fila)* |
-| `:nth-child(odd)` | Todos los hijos impares (1, 3, 5...) | `tbody > tr:nth-child(odd)` |
-| `:nth-child(even)` | Todos los hijos pares (2, 4, 6...) | `tbody > tr:nth-child(even)` |
-| `:nth-child(2n+1)` | Fórmula algebraica de repetición | `li:nth-child(3n+1)` |
-| `:nth-last-child(n)` | Cuenta desde el final hacia el principio | `tr:nth-last-child(1)` *(Última fila)* |
-| `:first-of-type` | El primer elemento **de su mismo tag** | `div > p:first-of-type` |
-| `:last-of-type` | El último elemento **de su mismo tag** | `div > p:last-of-type` |
-| `:nth-of-type(n)` | El n-ésimo elemento **de su mismo tag** | `table td:nth-of-type(3)` *(Columna 3)* |
-| `:only-of-type` | El único de su tipo de etiqueta entre hermanos | `article > h1:only-of-type` |
+| `:first-child` | First child of its parent | `ul#menu > li:first-child` |
+| `:last-child` | Last child of its parent | `ul#menu > li:last-child` |
+| `:only-child` | Element that is the only child of its parent | `div.alert > span:only-child` |
+| `:nth-child(n)` | Child at index `n` (1-indexed) | `tr:nth-child(2)` *(Second row)* |
+| `:nth-child(odd)` | All odd children (1, 3, 5...) | `tbody > tr:nth-child(odd)` |
+| `:nth-child(even)` | All even children (2, 4, 6...) | `tbody > tr:nth-child(even)` |
+| `:nth-child(2n+1)` | Algebraic formula pattern | `li:nth-child(3n+1)` |
+| `:nth-last-child(n)` | Counts backwards from the last child | `tr:nth-last-child(1)` *(Last row)* |
+| `:first-of-type` | First element of its specific tag type | `div > p:first-of-type` |
+| `:last-of-type` | Last element of its specific tag type | `div > p:last-of-type` |
+| `:nth-of-type(n)` | N-th element of its specific tag type | `table td:nth-of-type(3)` *(Column 3)* |
+| `:only-of-type` | Sole element of its tag type among siblings | `article > h1:only-of-type` |
 
-#### 💡 Ejemplos Prácticos con Tablas HTML
+#### 💡 Practical Examples with Tables
 
 ```html
 <table id="users-table">
   <thead>
-    <tr> <th>ID</th> <th>Nombre</th> <th>Rol</th> <th>Acciones</th> </tr>
+    <tr> <th>ID</th> <th>Name</th> <th>Role</th> <th>Actions</th> </tr>
   </thead>
   <tbody>
     <tr> <td>1</td> <td>Alice</td> <td>Admin</td> <td><button class="edit">✏️</button></td> </tr>
@@ -264,21 +264,21 @@ Ideales para tablas, listas desplegables, tarjetas de productos o filas dinámic
 ```java
 // Selenium Java:
 
-// Primera fila de la tabla
+// First user row in table
 @FindBy(css = "#users-table tbody > tr:first-child")
-private WebElement primerFilaUsuario;
+private WebElement firstUserRow;
 
-// Segunda fila, columna 2 (Nombre: "Bob")
+// Second row, column 2 (Name: "Bob")
 @FindBy(css = "#users-table tbody > tr:nth-child(2) > td:nth-of-type(2)")
-private WebElement nombreSegundoUsuario;
+private WebElement secondUserNameCell;
 
-// Botón editar de la última fila
+// Edit button of the last table row
 @FindBy(css = "#users-table tbody > tr:last-child button.edit")
-private WebElement botonEditarUltimoUsuario;
+private WebElement lastRowEditButton;
 
-// La 3ra columna (Rol) de todas las filas
+// The 3rd column (Role) across all rows
 @FindBy(css = "#users-table tbody tr > td:nth-child(3)")
-private List<WebElement> todosLosRoles;
+private List<WebElement> allRoleCells;
 ```
 
 </details>
@@ -286,55 +286,55 @@ private List<WebElement> todosLosRoles;
 ---
 
 <details>
-<summary><b>6. Pseudo-clases de Estado de Formularios (`:enabled`, `:disabled`, `:checked`)</b></summary>
+<summary><b>6. Form Element State Pseudo-Classes (`:enabled`, `:disabled`, `:checked`)</b></summary>
 <br>
 
-Permiten localizar elementos basándose en su estado interactivo en el navegador.
+Locate form inputs based on their dynamic browser interaction state.
 
-| Selector de Estado | Descripción |
+| State Selector | Description |
 | :--- | :--- |
-| `:enabled` | Elementos de formulario activos y habilitados para interacción |
-| `:disabled` | Elementos deshabilitados (`disabled`) |
-| `:checked` | Radio buttons o Checkboxes marcados/tildados |
-| `:focus` | Elemento que tiene el foco actual del teclado/cursor |
-| `:required` | Inputs marcados con atributo obligatorio |
-| `:optional` | Inputs sin requerimiento obligatorio |
-| `:valid` / `:invalid` | Elementos con validación HTML5 aprobada o fallida |
-| `:read-only` | Elementos con atributo `readonly` |
+| `:enabled` | Form elements enabled and ready for interaction |
+| `:disabled` | Form elements with `disabled` attribute |
+| `:checked` | Radio buttons or checkboxes currently ticked/selected |
+| `:focus` | Element currently holding keyboard/cursor focus |
+| `:required` | Form inputs with the required constraint |
+| `:optional` | Form inputs without the required constraint |
+| `:valid` / `:invalid` | Elements passing or failing HTML5 constraint validation |
+| `:read-only` | Elements with the `readonly` attribute |
 
-#### 💡 Ejemplos Prácticos
+#### 💡 Practical Examples
 
 ```html
 <form id="order-form">
   <input type="checkbox" id="terms" checked>
   <input type="checkbox" id="newsletter">
   
-  <input type="text" id="coupon" disabled placeholder="Cupón desactivado">
-  <input type="text" id="phone" required placeholder="Teléfono (Obligatorio)">
+  <input type="text" id="coupon" disabled placeholder="Coupon disabled">
+  <input type="text" id="phone" required placeholder="Phone number (Required)">
   
-  <button id="submit-btn" disabled class="btn">Pagar</button>
-  <button id="reset-btn" class="btn">Limpiar</button>
+  <button id="submit-btn" disabled class="btn">Pay Now</button>
+  <button id="reset-btn" class="btn">Clear</button>
 </form>
 ```
 
 ```java
 // Selenium Java:
 
-// Checkbox que está actualmente seleccionado
+// Checkbox that is currently checked
 @FindBy(css = "#order-form input[type='checkbox']:checked")
-private WebElement checkboxSeleccionado;
+private WebElement checkedTermsCheckbox;
 
-// Botón que se encuentra deshabilitado
+// Submit button in disabled state
 @FindBy(css = "#order-form button:disabled")
-private WebElement botonDeshabilitado;
+private WebElement disabledSubmitButton;
 
-// Botón habilitado para clic
+// Button enabled for click
 @FindBy(css = "#order-form button:enabled")
-private WebElement botonHabilitado;
+private WebElement enabledButton;
 
-// Campo de texto obligatorio
+// Mandatory text field
 @FindBy(css = "#order-form input:required")
-private WebElement campoRequerido;
+private WebElement requiredPhoneField;
 ```
 
 </details>
@@ -342,34 +342,34 @@ private WebElement campoRequerido;
 ---
 
 <details>
-<summary><b>7. Pseudo-clases Lógicas: Negación `:not()` y Relacional `:has()`</b></summary>
+<summary><b>7. Logical Pseudo-Classes: Negation `:not()` and Relational `:has()`</b></summary>
 <br>
 
-Selectores avanzados de filtrado y navegación inversa hacia padres.
+Advanced filtering and upward parent-node matching.
 
-| Selector | Nombre | Función |
+| Selector | Name | Function |
 | :--- | :--- | :--- |
-| `:not(selector)` | Negación | Excluye elementos que coincidan con el selector dentro de los paréntesis |
-| `:has(selector)` | Relacional *(CSS Level 4)* | Selecciona el **padre/ancestro** que contenga a dicho hijo |
-| `:is(s1, s2)` | Agrupador | Coincide con cualquiera de los selectores dados |
-| `:where(s1, s2)` | Agrupador neutro | Idéntico a `:is()` pero sin aumentar especificidad |
+| `:not(selector)` | Negation | Excludes elements matching the inner selector |
+| `:has(selector)` | Relational *(CSS Level 4)* | Selects the **parent/ancestor** element containing that child |
+| `:is(s1, s2)` | Match-any list | Matches any selector in the comma-separated list |
+| `:where(s1, s2)` | Zero-specificity list | Identical to `:is()`, but keeps specificity score at 0 |
 
-#### 💡 La Revolución de `:has()` (Seleccionar al Padre en CSS)
-> Históricamente en CSS no se podía seleccionar un elemento padre basado en sus hijos (había que recurrir a XPath `//div[..//button]`). **¡Hoy en día `:has()` ya es soportado de forma nativa en todos los navegadores modernos!**
+#### 💡 The Power of `:has()` (Selecting Parents in CSS)
+> Historically, CSS could not traverse upwards to select parent elements based on child contents (requiring XPath `//div[..//button]`). **Today, `:has()` is natively supported across all modern browsers!**
 
-#### 💡 Ejemplos Prácticos
+#### 💡 Practical Examples
 
 ```html
 <div class="user-card" id="card-1">
-  <h4>Juan Pérez</h4>
-  <span class="badge status-pending">Pendiente</span>
-  <button class="btn-approve">Aprobar</button>
+  <h4>John Doe</h4>
+  <span class="badge status-pending">Pending</span>
+  <button class="btn-approve">Approve</button>
 </div>
 
 <div class="user-card" id="card-2">
-  <h4>María Gómez</h4>
-  <span class="badge status-active">Activo</span>
-  <button class="btn-delete">Eliminar</button>
+  <h4>Jane Smith</h4>
+  <span class="badge status-active">Active</span>
+  <button class="btn-delete">Delete</button>
 </div>
 
 <form>
@@ -382,28 +382,28 @@ Selectores avanzados de filtrado y navegación inversa hacia padres.
 ```java
 // Selenium Java:
 
-// 1. NEGACIÓN :not()
-// Todos los inputs que NO sean de tipo hidden
+// 1. NEGATION :not()
+// All input fields that are NOT hidden
 @FindBy(css = "form input:not([type='hidden'])")
-private List<WebElement> inputsVisibles;
+private List<WebElement> visibleInputs;
 
-// Botones que NO tengan la clase 'disabled'
+// Buttons that do NOT have the 'disabled' class
 @FindBy(css = "button:not(.disabled)")
-private List<WebElement> botonesHabilitados;
+private List<WebElement> enabledButtons;
 
-// 2. RELACIONAL :has() -> SELECCIÓN DE PADRE
-// La tarjeta de usuario (.user-card) que contenga el botón con clase 'btn-delete'
+// 2. RELATIONAL :has() -> PARENT SELECTION
+// The user card (.user-card) containing the delete button
 @FindBy(css = ".user-card:has(button.btn-delete)")
-private WebElement tarjetaUsuarioConBotonEliminar;
+private WebElement cardWithDeleteButton;
 
-// La fila de una tabla que contenga el texto/estado 'Activo'
+// The table row containing an active status badge
 @FindBy(css = "tr:has(span.status-active)")
-private WebElement filaConUsuarioActivo;
+private WebElement rowWithActiveUser;
 
-// 3. AGRUPADOR :is()
-// Encabezados h1, h2 o h3 dentro del main
+// 3. GROUPING :is()
+// Headings h1, h2, or h3 inside the main container
 @FindBy(css = "main :is(h1, h2, h3)")
-private List<WebElement> encabezadosPrincipales;
+private List<WebElement> mainHeadings;
 ```
 
 </details>
@@ -411,50 +411,50 @@ private List<WebElement> encabezadosPrincipales;
 ---
 
 <details>
-<summary><b>8. Catálogo de Combinaciones Complejas (Casos Reales de Automatización)</b></summary>
+<summary><b>8. Catalog of Real-World Automation Combinations</b></summary>
 <br>
 
-Aquí tienes una colección de las combinaciones más frecuentes y robustas utilizadas en pruebas end-to-end con Selenium WebDriver.
+Production-tested combinations for enterprise web automation with Selenium WebDriver.
 
-### Combinación 1: ID Dinámico + Clase + Atributo Específico
+### Combination 1: Dynamic ID Prefix + Class + Specific Attribute
 ```css
-/* Busca un input cuyo ID empiece con 'usr_', tenga la clase 'form-control' y sea de tipo 'email' */
+/* Input with ID starting with 'usr_', having class 'form-control' and type 'email' */
 input[id^='usr_'].form-control[type='email']
 ```
 
-### Combinación 2: Contenedor Padre por ID + Hijo Directo + Atributo Parcial
+### Combination 2: Parent ID Suffix + Direct Child + Partial Action Attribute
 ```css
-/* El botón de guardar dentro del modal específico que termina en '_container' */
+/* Save button inside modal container ending with '_container' */
 div[id$='_container'] > div.modal-footer > button[data-action*='save']
 ```
 
-### Combinación 3: Elemento Hermano Inmediato con Filtro Negado
+### Combination 3: Sibling with Negated State Filter
 ```css
-/* El span de alerta que está inmediatamente después de un input que NO es válido */
+/* Error span placed immediately after an invalid input, ignoring hidden alerts */
 input:invalid + span.error-message:not(.hidden)
 ```
 
-### Combinación 4: Fila Específica de Tabla por Estado del Hijo
+### Combination 4: Specific Table Row Filtered by Child Badge
 ```css
-/* Selecciona el botón de descarga solo en la fila que tiene un badge de estado 'completed' */
+/* Download button only inside the table row that has a 'completed' badge */
 table#orders-table tbody tr:has(span.badge-completed) button.btn-download
 ```
 
-### Combinación 5: Menú Desplegable - Item N con Clase Excluida
+### Combination 5: Dropdown Menu Item N Excluding Disabled Items
 ```css
-/* El tercer elemento de una lista desplegable que no esté deshabilitado */
+/* Third item in dropdown list that is not disabled */
 ul.dropdown-menu > li:nth-child(3):not(.disabled) > a
 ```
 
-### Combinación 6: Selector Multi-Atributo Case-Insensitive
+### Combination 6: Multi-Attribute Case-Insensitive Search Input
 ```css
-/* Buscar input por placeholder que contenga 'search' o 'SEARCH' */
+/* Input matching placeholder containing 'search' regardless of upper/lower case */
 input.search-input[placeholder*='search' i][type='search']
 ```
 
-### Combinación 7: Padre que tiene un Checkbox Marcado
+### Combination 7: Parent Row Containing Checked Checkbox
 ```css
-/* El contenedor de fila (.item-row) cuyo checkbox interno esté tildado */
+/* Row container (.item-row) whose inner checkbox is currently checked */
 div.item-row:has(input[type='checkbox']:checked)
 ```
 
@@ -463,26 +463,26 @@ div.item-row:has(input[type='checkbox']:checked)
 ---
 
 <details>
-<summary><b>9. CSS vs XPath: Guía de Decisión Rápida</b></summary>
+<summary><b>9. CSS vs. XPath: Decision Matrix</b></summary>
 <br>
 
-| Criterio | Selector CSS | XPath | Recomendación |
+| Criteria | CSS Selector | XPath | Recommendation |
 | :--- | :---: | :---: | :--- |
-| **Velocidad de ejecución** | ⚡ Más rápido (nativo del motor CSS del navegador) | 🐢 Ligeramente más lento en navegadores antiguos | **CSS** para el 90% de los casos |
-| **Legibilidad & Mantenimiento** | Limpio, compacto y estándar web | Verboso y propenso a romperse (`//div[2]/span/..`) | **CSS** |
-| **IDs dinámicos (Prefijo/Sufijo)** | `[id^='x']`, `[id$='y']` | `starts-with()`, `ends-with()` | **CSS** (sintaxis más limpia) |
-| **Navegar hacia arriba (Padre)** | `:has(...)` | `/..` o `parent::` o `ancestor::` | **CSS con `:has()`** o **XPath** si el motor no soporta :has() |
-| **Búsqueda por Texto Visible Directo** | ❌ No soportado de forma estándar directa | `//*[text()='Ingresar']` | **XPath** (única ventaja exclusiva) |
+| **Execution Speed** | ⚡ Fastest (native browser engine) | 🐢 Slower in legacy engines | **CSS** for 90% of locators |
+| **Readability & Maintenance** | Clean, concise, standard web syntax | Verbose, brittle (`//div[2]/span/..`) | **CSS** |
+| **Dynamic IDs (Prefix/Suffix)** | `[id^='x']`, `[id$='y']` | `starts-with()`, `ends-with()` | **CSS** (cleaner syntax) |
+| **Upward Traversal (Parent)** | `:has(...)` | `/..`, `parent::`, `ancestor::` | **CSS with `:has()`** or **XPath** if browser is legacy |
+| **Direct Visible Text Search** | ❌ Not natively supported | `//*[text()='Submit']` | **XPath** (sole unique advantage) |
 
 </details>
 
 ---
 
 <details>
-<summary><b>10. Plantilla Java de Referencia para Page Objects (`BasePage`)</b></summary>
+<summary><b>10. Page Object Model Template (`BasePage`)</b></summary>
 <br>
 
-Cómo incorporar estos selectores directamente en tus clases de Página en `src/main/java/com/bdd/pages/`:
+How to organize these selectors in your Page Object classes under `src/main/java/com/bdd/pages/`:
 
 ```java
 package com.bdd.pages;
@@ -495,27 +495,27 @@ import java.util.List;
 
 public class LoginPage extends BasePage {
 
-    // 1. Selector por ID simple
+    // 1. Simple ID selector
     @FindBy(css = "#username")
     private WebElement usernameInput;
 
-    // 2. Selector por Atributo de testing exacto
+    // 2. Exact test attribute selector
     @FindBy(css = "[data-testid='password-field']")
     private WebElement passwordInput;
 
-    // 3. Selector con ID Dinámico (Prefijo 'btn_login_') y múltiples clases
+    // 3. Dynamic ID prefix ('btn_login_') with chained classes
     @FindBy(css = "button[id^='btn_login_'].btn.btn-primary")
     private WebElement submitButton;
 
-    // 4. Selector con Negación
+    // 4. Negation selector
     @FindBy(css = ".alert-box:not(.d-none)")
     private WebElement visibleErrorMessage;
 
-    // 5. Selector Relacional :has() para localizar la tarjeta activa
+    // 5. Relational :has() selector to find active card parent
     @FindBy(css = ".account-card:has(span.badge-active)")
     private WebElement activeAccountCard;
 
-    // 6. Lista de elementos por jerarquía e índices
+    // 6. List of elements with nth-child pattern
     @FindBy(css = "table#results-table tbody > tr:nth-child(odd)")
     private List<WebElement> oddResultRows;
 
@@ -523,9 +523,9 @@ public class LoginPage extends BasePage {
         super(driver);
     }
 
-    // Método con By dinámico en tiempo de ejecución
-    public WebElement getRowByColumnIndex(int colIndex) {
-        By dynamicCss = By.cssSelector(String.format("table tbody tr > td:nth-child(%d)", colIndex));
+    // Dynamic runtime selector using By.cssSelector
+    public WebElement getCellByColumnIndex(int columnIndex) {
+        By dynamicCss = By.cssSelector(String.format("table tbody tr > td:nth-child(%d)", columnIndex));
         return getDriver().findElement(dynamicCss);
     }
 
@@ -541,17 +541,17 @@ public class LoginPage extends BasePage {
 
 ---
 
-## 🚀 Resumen Mnemotécnico
+## 🚀 Quick Mnemonic Summary
 
-Para recordar rápidamente los símbolos de atributos:
+Remember attribute symbols at a glance:
 
-- `#` : **ID** (`#mi-id`)
-- `.` : **Clase** (`.mi-clase`)
-- `^=` : **Empieza** como el acento circunflejo al inicio (*Top / Inicio*)
-- `$=` : **Termina** como el símbolo de dólar (*Final de la línea en Regex*)
-- `*=` : **Contiene** como el asterisco comodín (*Wildcard*)
-- `>` : **Hijo directo**
-- `+` : **Hermano contiguo**
-- `~` : **Hermano general**
-- `:has()` : **Padre que contiene a**
-- `:not()` : **Excluir elementos**
+- `#` : **ID** (`#my-id`)
+- `.` : **Class** (`.my-class`)
+- `^=` : **Starts with** (Caret pointing to the top/beginning)
+- `$=` : **Ends with** (Dollar sign as line ending)
+- `*=` : **Contains** (Asterisk wildcard)
+- `>` : **Direct child**
+- `+` : **Adjacent sibling**
+- `~` : **General sibling**
+- `:has()` : **Parent containing child**
+- `:not()` : **Exclusion / negation filter**

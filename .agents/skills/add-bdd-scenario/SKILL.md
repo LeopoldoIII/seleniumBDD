@@ -51,7 +51,8 @@ Before writing any new step definition, inspect existing steps in:
 ---
 
 ## Step 3: Draft Gherkin Scenario
-Format the scenario cleanly using declarative business language:
+Format the scenario cleanly using declarative business language in **English** (even if the user request was in another language):
+
 
 ```gherkin
   @negative

@@ -29,9 +29,15 @@ Modular rules and runbooks are organized under `.agents/`:
 - `.agents/rules/ui-testing.md`: Page Object Model, BasePage methods, and driver lifecycle
 - `.agents/rules/api-testing.md`: ApiClient, REST Assured conventions, and assertions
 - `.agents/rules/code-style.md`: Code style, imports, and naming standards
+- `.agents/rules/documentation.md`: Mandatory English for all documentation, Gherkin features, and code
 - `.agents/skills/create-ui-test/`: Procedural runbook for creating UI / Mobile tests
 - `.agents/skills/create-api-test/`: Procedural runbook for creating REST API tests
 - `.agents/skills/create-db-test/`: Procedural runbook for database SQL validations
 - `.agents/skills/add-bdd-scenario/`: Procedural runbook for translating requirements to BDD scenarios
 - `.agents/skills/dom-to-page-object/`: Procedural runbook for parsing DOM HTML into Page Objects and locators
 - `.agents/skills/run-tests/`: Procedural runbook for running and filtering test suites
+
+## Language & Documentation Standards
+- **Mandatory English for Files**: All generated documentation (READMEs, cheat sheets, markdown notes), Gherkin feature files, Java code, comments, and commit messages MUST be written strictly in English, even if the user prompts in another language.
+- **Chat Conversational Flexibility**: Autonomous agents may converse and explain in the user's preferred language in the chat, but files written to disk must always be in English.
+

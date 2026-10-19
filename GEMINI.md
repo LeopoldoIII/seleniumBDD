@@ -91,3 +91,7 @@ seleniumBDD/
 5. **Configuration**:
    - Read project environment values using `ConfigReader.getProperty(key)` or `ConfigReader.getBaseUrl()`.
    - Never hardcode environment credentials or base URLs inside step definitions or page objects.
+6. **Language & Documentation Policy**:
+   - All generated code, Gherkin features, comments, JavaDoc, and documentation files (READMEs, cheat sheets) must strictly be written in English.
+   - Conversational chat may be in Spanish or the user's preferred language, but all files written to disk must be in English.
+

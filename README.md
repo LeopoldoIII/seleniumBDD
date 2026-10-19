@@ -2,7 +2,12 @@
 
 Enterprise-grade test automation framework built for **Web UI**, **REST API**, **Mobile (Android & iOS via Appium)**, and **Database (SQL/JDBC)** testing using **Cucumber BDD**, **TestNG**, and **Selenium WebDriver**, with out-of-the-box support for **Sauce Labs** cloud execution.
 
+> 📚 **Interactive Cheat Sheets & Quick References**:
+> - [CSS & ID Selectors Guide (Accordion)](README_CSS_SELECTORS.md)
+> - [Java & Automation Methods Guide (Accordion)](README_AUTOMATION_METHODS.md)
+
 ---
+
 
 ## ⚡ Quick Start & Common Usage Commands
 

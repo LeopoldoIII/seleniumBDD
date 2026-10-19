@@ -11,10 +11,12 @@ Follow this step-by-step workflow to implement new UI tests in this repository.
 
 ## Step 1: Define the Gherkin Scenario
 Create or update a `.feature` file in `src/test/resources/features/UI/`:
+- MUST be written in standard English (titles, scenarios, steps, tables).
 - Tag the feature with `@ui`.
 - Use declarative, business-readable language.
 - Structure with `Given`, `When`, `Then`, and `And`.
 - Tag scenarios appropriately (e.g., `@smoke`, `@regression`).
+
 
 ```gherkin
 @ui

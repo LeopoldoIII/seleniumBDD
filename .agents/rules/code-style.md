@@ -21,6 +21,7 @@
    - Remove unused imports before committing.
 
 3. **Gherkin Feature Files**:
+   - MUST be written entirely in English (Feature titles, scenario descriptions, Given/When/Then steps, and Examples tables).
    - Use declarative language rather than imperative clicking instructions.
    - Keep feature files in standard Cucumber structure:
      - Feature title and narrative
@@ -34,3 +35,8 @@
    - Avoid throwing raw `Exception` where specific exceptions can be caught or propagated.
    - Clean up resources properly.
    - Do not commit debugging `System.out.println()` statements; use proper logging or assertions.
+
+5. **Language & Documentation Standards**:
+   - All code, method names, variables, JavaDoc, comments, and project documentation (READMEs, cheat sheets, markdown guides) must strictly be in English.
+   - Never mix languages in code comments or feature files.
+

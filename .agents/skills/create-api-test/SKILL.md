@@ -11,8 +11,10 @@ Follow this step-by-step workflow to implement new REST Assured API tests in thi
 
 ## Step 1: Define the Gherkin Scenario
 Create or update a `.feature` file in `src/test/resources/features/API/`:
+- MUST be written in standard English (titles, scenarios, steps).
 - Tag scenarios with `@api`.
 - Parameterize URLs (relative endpoints resolve to `api.baseUri`), query parameters, payloads, and expected status codes.
+
 
 ```gherkin
 @api @smoke

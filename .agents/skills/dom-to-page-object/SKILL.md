@@ -23,8 +23,9 @@ When provided with an HTML snippet or full DOM:
    - **Tables**: Row counting, finding row by text, cell extraction.
    - **Error / Success Banners**: Alert text getters and visibility checks.
    - **Spinners / Loaders**: Waits for loading indicators to disappear.
-6. **Matching Step Definitions**: Ready-to-use Cucumber glue code in `com.bdd.steps.ui`.
-7. **Matching Gherkin Scenario**: Ready-to-use `.feature` file snippet.
+6. **Matching Step Definitions**: Ready-to-use Cucumber glue code in `com.bdd.steps.ui` (all method names and annotations in English).
+7. **Matching Gherkin Scenario**: Ready-to-use `.feature` file snippet written strictly in English.
+
 
 ---
 
