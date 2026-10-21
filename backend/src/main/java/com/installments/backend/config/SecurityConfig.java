@@ -75,6 +75,9 @@ public class SecurityConfig {
                                 "/api/plans/reset",
                                 "/actuator/**",
                                 "/h2-console/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**"

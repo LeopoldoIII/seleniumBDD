@@ -38,6 +38,13 @@ public class DataInitializer implements CommandLineRunner {
         planRepository.save(new InstallmentPlan("PLAN-102", "Bob Johnson", 600.00, 6, 100.00, "PAID"));
         planRepository.save(new InstallmentPlan("PLAN-103", "Charlie Brown", 2400.00, 24, 100.00, "PENDING"));
 
+        // Seed test scenarios aligned with Aplazo challenge specification
+        planRepository.save(new InstallmentPlan("PLAN-1001", "Diana Prince", 1200.00, 12, 100.00, "ACTIVE"));
+        planRepository.save(new InstallmentPlan("PLAN-1002", "Bruce Wayne", 300.00, 3, 100.00, "ACTIVE"));
+        planRepository.save(new InstallmentPlan("PLAN-1003", "Clark Kent", 60.00, 2, 30.00, "PAID"));
+        planRepository.save(new InstallmentPlan("PLAN-1004", "Barry Allen", 1500.00, 6, 250.00, "DELINQUENT"));
+        planRepository.save(new InstallmentPlan("PLAN-1005", "Arthur Curry", 100.00, 3, 33.33, "ACTIVE"));
+
         // Seed initial payment transaction for PAID plan PLAN-102
         if (paymentRepository.findByPlanId("PLAN-102").isEmpty()) {
             paymentRepository.save(new com.installments.backend.model.Payment(
@@ -45,6 +52,26 @@ public class DataInitializer implements CommandLineRunner {
                     600.00,
                     "CREDIT_CARD",
                     "TXN-INIT-102"
+            ));
+        }
+
+        // Seed partial payment for PLAN-1002 (.00 of .00 installment)
+        if (paymentRepository.findByPlanId("PLAN-1002").isEmpty()) {
+            paymentRepository.save(new com.installments.backend.model.Payment(
+                    "PLAN-1002",
+                    40.00,
+                    "DEBIT_CARD",
+                    "TXN-PARTIAL-1002"
+            ));
+        }
+
+        // Seed complete payment for PLAN-1003 (.00 total)
+        if (paymentRepository.findByPlanId("PLAN-1003").isEmpty()) {
+            paymentRepository.save(new com.installments.backend.model.Payment(
+                    "PLAN-1003",
+                    60.00,
+                    "SPEI_TRANSFER",
+                    "TXN-SETTLED-1003"
             ));
         }
     }
